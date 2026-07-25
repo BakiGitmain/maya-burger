@@ -13,9 +13,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Maya Burger",
-  description: "Offers Best,fast and fresh Foods!",
   metadataBase: new URL("https://maya-burger.vercel.app"),
+
+  title: "Maya Burger",
+
+  description: "Offers Best, fast and fresh Foods!",
+
+  openGraph: {
+    title: "Maya Burger",
+    description: "Offers Best, fast and fresh Foods!",
+    url: "https://maya-burger.vercel.app",
+    siteName: "Maya Burger",
+    type: "website",
+
+    images: [
+      {
+        url: "/images/maya-og.png",
+        width: 1200,
+        height: 630,
+        alt: "Maya Burger - Best Food Fast and Fresh",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Maya Burger",
+    description: "Offers Best, fast and fresh Foods!",
+    images: ["/images/maya-og.png"],
+  },
 };
 
 export default function RootLayout({
@@ -28,10 +54,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#000000]">
-        
+      <body className="flex min-h-full flex-col bg-[#000000]">
         {children}
-        </body>
+      </body>
     </html>
   );
 }
