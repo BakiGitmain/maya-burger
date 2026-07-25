@@ -1,0 +1,586 @@
+/* =========================================================
+   BURGER BUTTON
+   ========================================================= */
+
+.burgerButton {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+
+  width: 64px;
+  height: 64px;
+
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+
+  cursor: pointer;
+
+  z-index: 99999;
+
+  pointer-events: auto;
+  touch-action: manipulation;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =========================================================
+   BURGER ICON CONTAINER
+   ========================================================= */
+
+.burgerIcon {
+  position: relative;
+
+  width: 48px;
+  height: 48px;
+
+  display: block;
+
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* Small hover effect */
+
+@media (hover: hover) {
+
+  .burgerButton:hover .burgerIcon {
+    transform: scale(1.06);
+  }
+
+}
+
+
+.burgerButton:active .burgerIcon {
+  transform: scale(0.94);
+}
+
+
+
+/* =========================================================
+   TOP BUN
+   ========================================================= */
+
+.topBun {
+  position: absolute;
+
+  top: 6px;
+  left: 2px;
+
+  width: 44px;
+  height: 14px;
+
+  border-radius:
+    24px 24px
+    7px 7px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffd95c 0%,
+      #ffc738 35%,
+      #f4ad1c 75%,
+      #e9970d 100%
+    );
+
+  box-shadow:
+    inset 0 2px 2px rgba(255, 255, 255, 0.55),
+    inset 0 -2px 2px rgba(149, 80, 0, 0.25),
+    0 2px 3px rgba(0, 0, 0, 0.18);
+
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+
+/* =========================================================
+   SESAME SEEDS
+   ========================================================= */
+
+/*
+   We create several sesame seeds without adding
+   extra HTML elements.
+*/
+
+.topBun::before {
+  content: "";
+
+  position: absolute;
+
+  top: 4px;
+  left: 8px;
+
+  width: 3px;
+  height: 1.6px;
+
+  border-radius: 50%;
+
+  background: #fff1b7;
+
+  transform: rotate(25deg);
+
+  box-shadow:
+    8px -1px 0 #fff1b7,
+    17px 1px 0 #fff1b7,
+    25px -1px 0 #fff1b7;
+}
+
+
+.topBun::after {
+  content: "";
+
+  position: absolute;
+
+  top: 8px;
+  left: 14px;
+
+  width: 3px;
+  height: 1.5px;
+
+  border-radius: 50%;
+
+  background: #fff1b7;
+
+  transform: rotate(-20deg);
+
+  box-shadow:
+    11px 0 0 #fff1b7,
+    20px -1px 0 #fff1b7;
+}
+
+
+
+/* =========================================================
+   LETTUCE
+   ========================================================= */
+
+.lettuce {
+  position: absolute;
+
+  top: 19px;
+  left: 2px;
+
+  width: 44px;
+  height: 6px;
+
+  border-radius:
+    50% 35% 55% 35%
+    /
+    60% 50% 55% 45%;
+
+  background:
+    linear-gradient(
+      180deg,
+      #6bd348,
+      #3eaa2d
+    );
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 1px 1px rgba(0, 0, 0, 0.15);
+
+  transform: rotate(-2deg);
+
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* Lettuce bumps */
+
+.lettuce::before {
+  content: "";
+
+  position: absolute;
+
+  left: 3px;
+  top: -2px;
+
+  width: 13px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #62ca43;
+}
+
+
+.lettuce::after {
+  content: "";
+
+  position: absolute;
+
+  right: 3px;
+  top: -2px;
+
+  width: 14px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #55be39;
+}
+
+
+
+/* =========================================================
+   TOMATO
+   ========================================================= */
+
+.tomato {
+  position: absolute;
+
+  top: 23px;
+  left: 5px;
+
+  width: 38px;
+  height: 5px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ff5548,
+      #e62f26
+    );
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.28),
+    0 1px 1px rgba(0, 0, 0, 0.15);
+
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+
+/* =========================================================
+   CHEESE
+   ========================================================= */
+
+.cheese {
+  position: absolute;
+
+  top: 27px;
+  left: 4px;
+
+  width: 40px;
+  height: 5px;
+
+  border-radius: 2px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffd83d,
+      #f6b912
+    );
+
+  transform: rotate(-2deg);
+
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.15);
+
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* Hanging cheese corner */
+
+.cheese::after {
+  content: "";
+
+  position: absolute;
+
+  right: 4px;
+  bottom: -4px;
+
+  width: 8px;
+  height: 8px;
+
+  background: #f6b912;
+
+  border-radius: 1px;
+
+  transform: rotate(45deg);
+}
+
+
+
+/* =========================================================
+   PATTY
+   ========================================================= */
+
+.patty {
+  position: absolute;
+
+  top: 30px;
+  left: 2px;
+
+  width: 44px;
+  height: 8px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #754021 0%,
+      #542914 55%,
+      #3c1d0d 100%
+    );
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 2px rgba(0, 0, 0, 0.35),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* Tiny grilled texture */
+
+.patty::before {
+  content: "";
+
+  position: absolute;
+
+  top: 2px;
+  left: 7px;
+
+  width: 5px;
+  height: 1px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.13);
+
+  box-shadow:
+    10px 3px 0 rgba(255, 255, 255, 0.1),
+    20px 0 0 rgba(255, 255, 255, 0.11),
+    27px 3px 0 rgba(255, 255, 255, 0.08);
+}
+
+
+
+/* =========================================================
+   BOTTOM BUN
+   ========================================================= */
+
+.bottomBun {
+  position: absolute;
+
+  top: 37px;
+  left: 2px;
+
+  width: 44px;
+  height: 9px;
+
+  border-radius:
+    5px 5px
+    18px 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8b82c 0%,
+      #e89a11 100%
+    );
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 -2px 2px rgba(128, 63, 0, 0.24),
+    0 2px 2px rgba(0, 0, 0, 0.18);
+
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+
+/* =========================================================
+   OPEN BURGER ANIMATION
+   ========================================================= */
+
+/*
+   IMPORTANT:
+
+   We're moving layers with transform instead of changing
+   top/height during the animation.
+
+   This is much better for animation performance.
+*/
+
+
+.open .topBun {
+  transform:
+    translateY(-14px)
+    rotate(-3deg);
+}
+
+
+.open .lettuce {
+  transform:
+    translateY(-7px)
+    translateX(-3px)
+    rotate(-6deg);
+}
+
+
+.open .tomato {
+  transform:
+    translateY(0px)
+    translateX(3px)
+    rotate(3deg);
+}
+
+
+.open .cheese {
+  transform:
+    translateY(7px)
+    translateX(-2px)
+    rotate(-5deg);
+}
+
+
+.open .patty {
+  transform:
+    translateY(14px)
+    rotate(2deg);
+}
+
+
+.open .bottomBun {
+  transform:
+    translateY(22px)
+    rotate(-2deg);
+}
+
+
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+.mobileMenu {
+  position: fixed;
+  top: 150px;
+  right: 0;
+
+  width: 230px;
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  background: rgba(12, 12, 10, 0.97);
+
+  border: none;
+    border-radius: 18px 0 0 18px;
+
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+
+  opacity: 0;
+  transform: translateY(-10px) scale(0.96);
+  transform-origin: top right;
+
+  pointer-events: none;
+
+  transition:
+    opacity 220ms ease,
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  z-index: 900;
+}
+
+.menuOpen {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.mobileLogo {
+  display: flex;
+  justify-content: flex-start;
+    padding-left: 4px;
+  padding-bottom: 12px;
+  margin-bottom: 6px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobileLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 10px;
+
+  color: #f4f4f4;
+  font-size: 16px;
+  text-decoration: none;
+
+  border-radius: 8px;
+
+  opacity: 0;
+  transform: translateX(14px);
+
+  transition:
+    opacity 250ms ease,
+    transform 300ms ease,
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
+.menuOpen .mobileLink {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mobileLink:hover {
+  color: #ffc928;
+  background: rgba(255, 201, 40, 0.05);
+}
+
+.activeMobileLink {
+  color: #ffc928;
+}
+
+.activeMobileLink svg {
+  color: #ffc928;
+}
+
+.activeMobileLink::before {
+  display: none;
+}
+
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .burgerIcon,
+  .topBun,
+  .lettuce,
+  .tomato,
+  .cheese,
+  .patty,
+  .bottomBun,
+  .mobileMenu,
+  .mobileLink {
+    transition-duration: 0.01ms !important;
+  }
+
+}
