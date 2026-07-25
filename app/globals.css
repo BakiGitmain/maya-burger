@@ -1,3 +1,22 @@
 @import "tailwindcss";
+.distressed-text {
+  display: block;
+  width: fit-content;
 
+  color: transparent;
+  background-image:
+    url("/textures/grunge.png"),
+    linear-gradient(var(--text-color), var(--text-color));
+
+  background-size:
+    300px 300px,
+    100% 100%;
+
+  background-position: center;
+  background-repeat: repeat, no-repeat;
+  background-blend-mode: multiply;
+
+  background-clip: text;
+  -webkit-background-clip: text;
+}
 
