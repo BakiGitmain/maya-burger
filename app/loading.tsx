@@ -1,15 +1,17 @@
 import Image from "next/image";
-import loader from '@/assets/loader.gif'
-const LoadingPage = () => {
-    return <div style={{
-        display: 'flex',
-        justifyContent:'center',
-        alignItems:'center',
-        height:'100vh',
-        width:'100vw',
-    }}>
-        <Image src={loader} height={150} width={150} alt="Loading..."/>
+
+export default function LoadingPage() {
+  return (
+    <div className="fixed inset-0 z-999999 flex items-center justify-center bg-black">
+      <Image
+        src="/images/loader.gif"
+        alt="Loading Maya Burger"
+        width={150}
+        height={150}
+        unoptimized
+        priority
+        className="h-auto w-30 sm:w-30"
+      />
     </div>
+  );
 }
- 
-export default LoadingPage;

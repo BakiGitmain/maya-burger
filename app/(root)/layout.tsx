@@ -1,7 +1,15 @@
-export default function RootGroupLayout({
+import Navbar from "@/components/navbar";
+import AppPreloader from "@/components/app-preloader";
+
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  return <>{children}</>;
+}) {
+  return (
+    <AppPreloader>
+      <Navbar />
+      {children}
+    </AppPreloader>
+  );
 }
