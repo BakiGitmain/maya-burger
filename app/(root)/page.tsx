@@ -3,8 +3,22 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { ArrowRight } from "lucide-react";
-import { MdDeliveryDining, MdOutlineVerified } from "react-icons/md";
+
+import {
+  MdDeliveryDining,
+  MdOutlineVerified,
+  MdLocalDrink,
+} from "react-icons/md";
+
 import { RiCoupon3Line } from "react-icons/ri";
+
+import {
+  FaHamburger,
+  FaPizzaSlice,
+  FaHotdog,
+} from "react-icons/fa";
+
+import { GiFrenchFries } from "react-icons/gi";
 
 const allura = Allura({
   subsets: ["latin"],
@@ -16,21 +30,58 @@ const bebas = Bebas_Neue({
   weight: "400",
 });
 
+/* ================================================= */
+/* CATEGORIES */
+/* ================================================= */
+
+const categories = [
+  {
+    name: "BURGERS",
+    description: "Juicy & Cheesy",
+    icon: FaHamburger,
+  },
+  {
+    name: "FRIES",
+    description: "Crispy & Golden",
+    icon: GiFrenchFries,
+  },
+  {
+    name: "PIZZA",
+    description: "Hot & Delicious",
+    icon: FaPizzaSlice,
+  },
+  {
+    name: "DRINKS",
+    description: "Chill & Refreshing",
+    icon: MdLocalDrink,
+  },
+  {
+    name: "BURRITO",
+    description: "Loaded & Tasty",
+    icon: FaHotdog,
+  },
+];
+
 export default function HomePage() {
   return (
     <main className="overflow-hidden bg-black text-white">
-      {/* ================= HERO ================= */}
-      <section className="relative h-[calc(100svh-80px)] overflow-hidden">
+      {/* ================================================= */}
+      {/* HERO */}
+      {/* ================================================= */}
+
+      <section className="relative overflow-hidden lg:h-[calc(100svh-80px)]">
         <div
           className="
             relative
             mx-auto
             flex
-            h-full
             w-full
             max-w-[1600px]
             items-start
             px-[clamp(12px,2vw,32px)]
+            pb-[clamp(15px,3vw,30px)]
+            lg:h-full
+            lg:pb-0
           "
         >
           {/* ================================================= */}
@@ -42,16 +93,17 @@ export default function HomePage() {
               relative
               z-20
               flex
-              h-full
               w-[54%]
               min-w-0
               flex-col
               pt-[clamp(8px,2vh,28px)]
               sm:w-[53%]
+              lg:h-full
               xl:w-[52%]
             "
           >
             {/* TAGLINE */}
+
             <p
               className={`
                 ${allura.className}
@@ -64,7 +116,10 @@ export default function HomePage() {
               Cravings, Satisfied
             </p>
 
+            {/* ================================================= */}
             {/* HEADING */}
+            {/* ================================================= */}
+
             <h1
               className={`
                 ${bebas.className}
@@ -98,7 +153,10 @@ export default function HomePage() {
               </span>
             </h1>
 
+            {/* ================================================= */}
             {/* DESCRIPTION */}
+            {/* ================================================= */}
+
             <p
               className="
                 mt-[clamp(10px,1.8vw,28px)]
@@ -113,7 +171,10 @@ export default function HomePage() {
               satisfy every craving.
             </p>
 
+            {/* ================================================= */}
             {/* BUTTON */}
+            {/* ================================================= */}
+
             <Link
               href="/menu"
               className="
@@ -164,23 +225,21 @@ export default function HomePage() {
                 items-center
                 justify-start
                 gap-[clamp(8px,2.5vw,34px)]
-
                 sm:w-[155%]
                 md:w-[140%]
                 lg:w-[125%]
-
                 xl:absolute
                 xl:bottom-6
                 xl:left-0
                 xl:mt-0
                 xl:w-[105%]
                 xl:gap-8
-
                 2xl:bottom-8
                 2xl:gap-10
               "
             >
               {/* FAST DELIVERY */}
+
               <div
                 className="
                   flex
@@ -221,6 +280,7 @@ export default function HomePage() {
               </div>
 
               {/* BEST QUALITY */}
+
               <div
                 className="
                   flex
@@ -261,6 +321,7 @@ export default function HomePage() {
               </div>
 
               {/* GREAT OFFERS */}
+
               <div
                 className="
                   flex
@@ -310,10 +371,10 @@ export default function HomePage() {
             className="
               relative
               z-10
-              h-full
               w-[46%]
               min-w-0
               sm:w-[47%]
+              lg:h-full
               xl:w-[48%]
             "
           >
@@ -346,15 +407,146 @@ export default function HomePage() {
                 width={1200}
                 height={1200}
                 priority
-                sizes="(max-width: 640px) 70vw,
-                       (max-width: 1024px) 65vw,
-                       60vw"
+                sizes="
+                  (max-width: 640px) 70vw,
+                  (max-width: 1024px) 65vw,
+                  60vw
+                "
                 className="h-auto w-full object-contain"
               />
             </div>
           </div>
         </div>
       </section>
+
+      {/* ================================================= */}
+      {/* FOOD CATEGORIES */}
+      {/* ================================================= */}
+
+      {/* ================================================= */}
+{/* FOOD CATEGORIES */}
+{/* ================================================= */}
+
+{/* ================================================= */}
+{/* FOOD CATEGORIES */}
+{/* ================================================= */}
+
+<section
+  className="
+    relative
+    z-30
+    w-full
+    px-[clamp(8px,4vw,60px)]
+    pb-[clamp(35px,6vw,90px)]
+    pt-2
+  "
+>
+  <div
+    className="
+      category-container
+      mx-auto
+      flex
+      w-full
+      max-w-[1400px]
+      items-stretch
+      overflow-hidden
+      rounded-[clamp(10px,1.5vw,22px)]
+      bg-[#f7f7f7]
+    "
+  >
+    {categories.map((category, index) => {
+      const Icon = category.icon;
+
+      return (
+        <div
+          key={category.name}
+          className="
+            category-item
+            group
+            relative
+            flex
+            min-w-0
+            flex-1
+            flex-col
+            items-center
+            justify-center
+            text-center
+            transition-all
+            duration-300
+            hover:bg-white
+          "
+        >
+          {/* ICON */}
+
+          <div
+            className="
+              category-icon
+              flex
+              items-center
+              justify-center
+              text-black
+              transition-all
+              duration-300
+
+              group-hover:-translate-y-1
+              group-hover:scale-110
+              group-hover:text-yellow-400
+            "
+          >
+            <Icon />
+          </div>
+
+          {/* TITLE */}
+
+          <h3
+            className={`
+              ${bebas.className}
+              category-title
+              whitespace-nowrap
+              tracking-[0.04em]
+              text-black
+              transition-colors
+              duration-300
+            `}
+          >
+            {category.name}
+          </h3>
+
+          {/* DESCRIPTION */}
+
+          <p
+            className="
+              category-description
+              whitespace-nowrap
+              text-neutral-600
+              transition-colors
+              duration-300
+              group-hover:text-neutral-800
+            "
+          >
+            {category.description}
+          </p>
+
+          {/* SEPARATOR */}
+
+          {index !== categories.length - 1 && (
+            <span
+              className="
+                absolute
+                right-0
+                top-1/2
+                h-[65%]
+                w-px
+                -translate-y-1/2
+                bg-yellow-400/40
+              "
+            />
+          )}
+        </div>
+      );
+    })}
+  </div>
+</section>
     </main>
   );
 }
