@@ -19,7 +19,6 @@ const bebas = Bebas_Neue({
 
 /* ================================================= */
 /* TEMPORARY DATA */
-/* Later this will come from your database */
 /* ================================================= */
 
 const bestSellers = [
@@ -55,103 +54,347 @@ const bestSellers = [
   },
 ];
 
+type Product = (typeof bestSellers)[number];
+
 /* ================================================= */
-/* SKELETON CARD */
+/* SKELETON */
 /* ================================================= */
 
 function ProductSkeleton() {
   return (
     <div className="bestseller-skeleton">
-      {/* IMAGE SKELETON */}
+      {/* IMAGE */}
 
-      <div className="skeleton-image">
-        <div className="skeleton-shimmer" />
-
-        <div className="skeleton-image-icon">
-          <div className="h-9 w-9 rounded-full bg-white/5" />
-        </div>
+      <div className="bestseller-skeleton-image">
+        <div className="skeleton-image-glow" />
       </div>
 
-      {/* CONTENT SKELETON */}
+      {/* CONTENT */}
 
-      <div className="skeleton-content">
-        <div className="skeleton-line skeleton-title-line" />
+      <div className="bestseller-skeleton-content">
+        <div className="skeleton-block skeleton-name" />
 
-        <div className="mt-4 space-y-2.5">
-          <div className="skeleton-line w-full" />
-          <div className="skeleton-line w-[88%]" />
-          <div className="skeleton-line w-[60%]" />
+        <div className="skeleton-description">
+          <div className="skeleton-block w-full" />
+          <div className="skeleton-block w-[92%]" />
+          <div className="skeleton-block w-[65%]" />
         </div>
 
-        <div className="skeleton-price" />
+        <div className="skeleton-block skeleton-price" />
       </div>
 
-      {/* MOVING SHINE */}
+      {/* SHIMMER */}
 
-      <div className="skeleton-card-sweep" />
+      <div className="skeleton-shine" />
     </div>
   );
 }
 
 /* ================================================= */
-/* POPULAR PICKS */
+/* INDIVIDUAL CARD */
 /* ================================================= */
 
-export default function PopularPicks() {
-  const sectionRef = useRef<HTMLElement | null>(null);
+function BestSellerCard({ product }: { product: Product }) {
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
+  /*
+    This becomes true ONLY when this specific
+    card enters the viewport.
+  */
   const [shouldLoad, setShouldLoad] = useState(false);
 
-  const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
+  /*
+    This becomes true only when this card's
+    real image has actually loaded.
+  */
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   /* ================================================= */
-  /* DETECT WHEN SECTION ENTERS VIEWPORT */
+  /* WATCH ONLY THIS CARD */
   /* ================================================= */
 
   useEffect(() => {
-    const section = sectionRef.current;
+    const card = cardRef.current;
 
-    if (!section) return;
+    if (!card) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
+    let observer: IntersectionObserver | null = null;
+    let started = false;
+
+    const startWatchingCard = () => {
+      /*
+        Prevent duplicate observers / loading.
+      */
+
+      if (observer || started) return;
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+
+          /*
+            THIS individual card is now visible.
+
+            Only now do we mount its real <Image>.
+          */
+
+          started = true;
+
           setShouldLoad(true);
 
-          // We only need to trigger this once.
-          observer.disconnect();
-        }
-      },
-      {
-        threshold: 0.08,
-      },
-    );
+          observer?.disconnect();
+          observer = null;
+        },
+        {
+          root: null,
 
-    observer.observe(section);
+          /*
+            Do not preload before the card
+            reaches the viewport.
+          */
+
+          rootMargin: "0px",
+
+          /*
+            15% of the card must be visible.
+          */
+
+          threshold: 0.15,
+        },
+      );
+
+      observer.observe(card);
+    };
+
+    /* ================================================= */
+    /* MAIN APP LOADER ALREADY FINISHED */
+    /* ================================================= */
+
+    if (document.documentElement.dataset.appReady === "true") {
+      startWatchingCard();
+    }
+
+    /* ================================================= */
+    /* OR WAIT FOR MAIN APP LOADER */
+    /* ================================================= */
+
+    window.addEventListener("app-ready", startWatchingCard);
+
+    /* ================================================= */
+    /* CLEANUP */
+    /* ================================================= */
 
     return () => {
-      observer.disconnect();
+      window.removeEventListener("app-ready", startWatchingCard);
+
+      observer?.disconnect();
     };
   }, []);
 
-  /* ================================================= */
-  /* IMAGE FINISHED LOADING */
-  /* ================================================= */
+  return (
+    <div
+      ref={cardRef}
+      className="
+        relative
+        w-[84%]
+        max-w-[325px]
+        justify-self-center
 
-  const handleImageLoaded = (id: number) => {
-    setLoadedImages((current) => ({
-      ...current,
-      [id]: true,
-    }));
-  };
+        sm:w-[80%]
+        sm:max-w-[350px]
 
+        md:w-full
+        md:max-w-none
+      "
+    >
+      {/* ================================================= */}
+      {/* BEFORE THIS CARD ENTERS VIEW */}
+      {/* ================================================= */}
+
+      {!shouldLoad && <div className="bestseller-card-placeholder" />}
+
+      {/* ================================================= */}
+      {/* CARD ENTERED VIEW */}
+      {/* ================================================= */}
+
+      {shouldLoad && (
+        <div className="relative">
+          {/* ================================================= */}
+          {/* REAL CARD */}
+          {/* ================================================= */}
+
+          <article
+            className={`
+              bestseller-card
+              group
+              overflow-hidden
+              rounded-xl
+              bg-[#0d0d0d]
+
+              transition-all
+              duration-500
+              ease-out
+
+              ${
+                imageLoaded
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-1 opacity-0"
+              }
+            `}
+          >
+            {/* ================================================= */}
+            {/* IMAGE */}
+            {/* ================================================= */}
+
+            <div
+              className="
+                relative
+                aspect-[16/11]
+                w-full
+                overflow-hidden
+                bg-[#111]
+
+                md:aspect-[4/3]
+              "
+            >
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                sizes="
+                  (max-width: 640px) 325px,
+                  (max-width: 1280px) 50vw,
+                  25vw
+                "
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(true)}
+                className="
+                  object-cover
+                  transition-transform
+                  duration-500
+                  ease-out
+
+                  group-hover:scale-[1.04]
+                "
+              />
+
+              {/* IMAGE BOTTOM FADE */}
+
+              <div
+                className="
+                  pointer-events-none
+                  absolute
+                  inset-x-0
+                  bottom-0
+                  h-[22%]
+                  bg-gradient-to-t
+                  from-[#0d0d0d]
+                  to-transparent
+                "
+              />
+            </div>
+
+            {/* ================================================= */}
+            {/* PRODUCT INFO */}
+            {/* ================================================= */}
+
+            <div
+              className="
+                flex
+                min-h-[160px]
+                flex-col
+                p-4
+
+                md:min-h-[190px]
+                md:p-[clamp(16px,1.5vw,22px)]
+              "
+            >
+              {/* NAME */}
+
+              <h3
+                className={`
+                  ${bebas.className}
+                  text-[1.35rem]
+                  leading-tight
+                  tracking-wide
+                  text-white
+
+                  md:text-[clamp(1.4rem,1.8vw,2rem)]
+                `}
+              >
+                {product.name}
+              </h3>
+
+              {/* DESCRIPTION */}
+
+              <p
+                className="
+                  mt-2
+                  text-[0.76rem]
+                  leading-5
+                  text-white/60
+
+                  md:text-[clamp(0.78rem,0.9vw,0.95rem)]
+                  md:leading-6
+                "
+              >
+                {product.description}
+              </p>
+
+              {/* PRICE */}
+
+              <p
+                className={`
+                  ${bebas.className}
+                  mt-auto
+                  pt-4
+                  text-[1.65rem]
+                  leading-none
+                  tracking-wide
+                  text-yellow-400
+
+                  md:pt-5
+                  md:text-[clamp(1.5rem,2vw,2.1rem)]
+                `}
+              >
+                ${product.price.toFixed(2)}
+              </p>
+            </div>
+          </article>
+
+          {/* ================================================= */}
+          {/* REAL LOADING SKELETON */}
+          {/* ================================================= */}
+
+          {!imageLoaded && (
+            <div
+              className="
+                absolute
+                inset-0
+                z-20
+              "
+            >
+              <ProductSkeleton />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ================================================= */
+/* POPULAR PICKS SECTION */
+/* ================================================= */
+
+export default function PopularPicks() {
   return (
     <section
-      ref={sectionRef}
       className="
         relative
         w-full
         bg-black
+
         px-[clamp(14px,4vw,60px)]
         pb-[clamp(60px,8vw,120px)]
         pt-[clamp(28px,4vw,65px)]
@@ -201,11 +444,15 @@ export default function PopularPicks() {
             className={`
               ${bebas.className}
               mt-[clamp(9px,1vw,16px)]
+
               flex
               items-center
               justify-center
+
               gap-[clamp(6px,0.9vw,14px)]
+
               whitespace-nowrap
+
               text-[clamp(2.15rem,5vw,5rem)]
               leading-[0.9]
               tracking-wide
@@ -241,6 +488,7 @@ export default function PopularPicks() {
           className="
             grid
             grid-cols-1
+
             gap-[clamp(24px,2.3vw,32px)]
 
             md:grid-cols-2
@@ -248,187 +496,12 @@ export default function PopularPicks() {
             xl:grid-cols-4
           "
         >
-          {bestSellers.map((product) => {
-            const imageLoaded = loadedImages[product.id] === true;
-
-            return (
-              <div
-                key={product.id}
-                className="
-                  relative
-                  w-[84%]
-                  max-w-[325px]
-                  justify-self-center
-
-                  sm:w-[80%]
-                  sm:max-w-[350px]
-
-                  md:w-full
-                  md:max-w-none
-                "
-              >
-                {/* ================================================= */}
-                {/* REAL CARD */}
-                {/* Only created once section enters viewport */}
-                {/* ================================================= */}
-
-                {shouldLoad && (
-                  <article
-                    className={`
-                      bestseller-card
-                      group
-                      overflow-hidden
-                      rounded-xl
-                      bg-[#0d0d0d]
-
-                      transition-all
-                      duration-700
-                      ease-out
-
-                      ${
-                        imageLoaded
-                          ? "translate-y-0 opacity-100"
-                          : "translate-y-2 opacity-0"
-                      }
-                    `}
-                  >
-                    {/* IMAGE */}
-
-                    <div
-                      className="
-                        relative
-                        aspect-[16/11]
-                        w-full
-                        overflow-hidden
-                        bg-[#111]
-
-                        md:aspect-[4/3]
-                      "
-                    >
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        sizes="
-                          (max-width: 640px) 325px,
-                          (max-width: 1280px) 50vw,
-                          25vw
-                        "
-                        onLoad={() => handleImageLoaded(product.id)}
-                        onError={() => handleImageLoaded(product.id)}
-                        className="
-                          object-cover
-                          transition-transform
-                          duration-500
-                          ease-out
-                          group-hover:scale-[1.04]
-                        "
-                      />
-
-                      {/* IMAGE BOTTOM FADE */}
-
-                      <div
-                        className="
-                          pointer-events-none
-                          absolute
-                          inset-x-0
-                          bottom-0
-                          h-[22%]
-                          bg-gradient-to-t
-                          from-[#0d0d0d]
-                          to-transparent
-                        "
-                      />
-                    </div>
-
-                    {/* ================================================= */}
-                    {/* PRODUCT INFO */}
-                    {/* ================================================= */}
-
-                    <div
-                      className="
-                        flex
-                        min-h-[160px]
-                        flex-col
-                        p-4
-
-                        md:min-h-[190px]
-                        md:p-[clamp(16px,1.5vw,22px)]
-                      "
-                    >
-                      <h3
-                        className={`
-                          ${bebas.className}
-                          text-[1.35rem]
-                          leading-tight
-                          tracking-wide
-                          text-white
-
-                          md:text-[clamp(1.4rem,1.8vw,2rem)]
-                        `}
-                      >
-                        {product.name}
-                      </h3>
-
-                      <p
-                        className="
-                          mt-2
-                          text-[0.76rem]
-                          leading-5
-                          text-white/60
-
-                          md:text-[clamp(0.78rem,0.9vw,0.95rem)]
-                          md:leading-6
-                        "
-                      >
-                        {product.description}
-                      </p>
-
-                      {/* PRICE */}
-
-                      <p
-                        className={`
-                          ${bebas.className}
-                          mt-auto
-                          pt-4
-                          text-[1.65rem]
-                          leading-none
-                          tracking-wide
-                          text-yellow-400
-
-                          md:pt-5
-                          md:text-[clamp(1.5rem,2vw,2.1rem)]
-                        `}
-                      >
-                        ${product.price.toFixed(2)}
-                      </p>
-                    </div>
-                  </article>
-                )}
-
-                {/* ================================================= */}
-                {/* REAL LOADING SKELETON */}
-                {/* ================================================= */}
-
-                {!imageLoaded && (
-                  <div
-                    className={`
-                      transition-opacity
-                      duration-500
-
-                      ${
-                        shouldLoad
-                          ? "opacity-100"
-                          : "opacity-100"
-                      }
-                    `}
-                  >
-                    <ProductSkeleton />
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {bestSellers.map((product) => (
+            <BestSellerCard
+              key={product.id}
+              product={product}
+            />
+          ))}
         </div>
 
         {/* ================================================= */}
@@ -440,14 +513,19 @@ export default function PopularPicks() {
             href="/menu"
             className="
               group
+
               inline-flex
               items-center
               justify-center
               gap-5
+
               rounded-full
+
               bg-yellow-400
+
               px-[clamp(28px,4vw,60px)]
               py-[clamp(11px,1vw,15px)]
+
               text-[clamp(0.75rem,1vw,0.95rem)]
               font-bold
               text-black
@@ -457,7 +535,6 @@ export default function PopularPicks() {
 
               hover:-translate-y-1
               hover:bg-yellow-300
-              hover:shadow-[0_10px_35px_rgba(250,204,21,0.2)]
             "
           >
             VIEW FULL MENU
@@ -466,8 +543,10 @@ export default function PopularPicks() {
               className="
                 h-5
                 w-5
+
                 transition-transform
                 duration-300
+
                 group-hover:translate-x-2
               "
             />

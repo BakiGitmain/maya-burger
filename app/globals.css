@@ -204,17 +204,40 @@
   left: -3px;
 }
 /* ========================================================= */
-/* BESTSELLER LOADING SKELETON */
+/* BESTSELLER PLACEHOLDER BEFORE VIEW */
+/* ========================================================= */
+
+.bestseller-card-placeholder {
+  width: 100%;
+
+  aspect-ratio: 16 / 11;
+
+  min-height: 320px;
+
+  border-radius: 0.75rem;
+
+  background: #0d0d0d;
+}
+
+@media (min-width: 768px) {
+  .bestseller-card-placeholder {
+    min-height: 390px;
+  }
+}
+
+/* ========================================================= */
+/* SKELETON CARD */
 /* ========================================================= */
 
 .bestseller-skeleton {
   position: relative;
 
+  width: 100%;
+  height: 100%;
+
   overflow: hidden;
 
-  width: 100%;
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.13);
 
   border-radius: 0.75rem;
 
@@ -222,11 +245,13 @@
 }
 
 /* ========================================================= */
-/* SKELETON IMAGE */
+/* IMAGE AREA */
 /* ========================================================= */
 
-.skeleton-image {
+.bestseller-skeleton-image {
   position: relative;
+
+  width: 100%;
 
   aspect-ratio: 16 / 11;
 
@@ -235,40 +260,52 @@
   background:
     radial-gradient(
       circle at 50% 45%,
-      rgba(255, 255, 255, 0.07),
-      transparent 42%
+      rgba(250, 204, 21, 0.08),
+      transparent 38%
     ),
-    #111111;
+    linear-gradient(
+      120deg,
+      #111111,
+      #181818,
+      #111111
+    );
 }
 
 @media (min-width: 768px) {
-  .skeleton-image {
+  .bestseller-skeleton-image {
     aspect-ratio: 4 / 3;
   }
 }
 
 /* ========================================================= */
-/* SOFT IMAGE PULSE */
+/* IMAGE GLOW */
 /* ========================================================= */
 
-.skeleton-image-icon {
+.skeleton-image-glow {
   position: absolute;
 
-  inset: 0;
+  top: 50%;
+  left: 50%;
 
-  display: flex;
+  width: 42%;
+  aspect-ratio: 1;
 
-  align-items: center;
-  justify-content: center;
+  border-radius: 999px;
 
-  animation: skeleton-pulse 1.8s ease-in-out infinite;
+  background: rgba(250, 204, 21, 0.06);
+
+  filter: blur(30px);
+
+  transform: translate(-50%, -50%);
+
+  animation: skeletonGlow 1.8s ease-in-out infinite;
 }
 
 /* ========================================================= */
 /* CONTENT */
 /* ========================================================= */
 
-.skeleton-content {
+.bestseller-skeleton-content {
   display: flex;
 
   min-height: 160px;
@@ -279,7 +316,7 @@
 }
 
 @media (min-width: 768px) {
-  .skeleton-content {
+  .bestseller-skeleton-content {
     min-height: 190px;
 
     padding: clamp(16px, 1.5vw, 22px);
@@ -287,146 +324,120 @@
 }
 
 /* ========================================================= */
-/* TEXT LINES */
+/* BLOCKS */
 /* ========================================================= */
 
-.skeleton-line {
-  height: 9px;
+.skeleton-block {
+  position: relative;
+
+  height: 8px;
+
+  overflow: hidden;
 
   border-radius: 999px;
 
   background: rgba(255, 255, 255, 0.08);
-
-  animation: skeleton-pulse 1.8s ease-in-out infinite;
 }
 
-.skeleton-title-line {
-  width: 68%;
-
-  height: 18px;
-
-  background: rgba(255, 255, 255, 0.12);
+.skeleton-name {
+  width: 72%;
+  height: 20px;
 }
 
-/* ========================================================= */
-/* PRICE */
-/* ========================================================= */
+.skeleton-description {
+  display: flex;
+
+  margin-top: 15px;
+
+  flex-direction: column;
+
+  gap: 9px;
+}
 
 .skeleton-price {
-  width: 70px;
-  height: 23px;
+  width: 72px;
+  height: 24px;
 
   margin-top: auto;
 
-  border-radius: 6px;
-
-  background: rgba(250, 204, 21, 0.12);
-
-  animation: skeleton-pulse 1.8s ease-in-out infinite;
+  background: rgba(250, 204, 21, 0.1);
 }
 
 /* ========================================================= */
-/* MAIN MOVING SHIMMER */
+/* BIG MOVING SHINE */
 /* ========================================================= */
 
-.skeleton-card-sweep {
+.skeleton-shine {
   position: absolute;
 
   top: 0;
   bottom: 0;
 
-  left: -100%;
+  left: -80%;
 
-  width: 70%;
+  width: 55%;
 
   pointer-events: none;
 
   background: linear-gradient(
-    100deg,
+    110deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.025) 30%,
-    rgba(255, 255, 255, 0.09) 48%,
-    rgba(250, 204, 21, 0.07) 55%,
-    rgba(255, 255, 255, 0.04) 65%,
+    rgba(255, 255, 255, 0.02) 25%,
+    rgba(255, 255, 255, 0.1) 47%,
+    rgba(250, 204, 21, 0.08) 52%,
+    rgba(255, 255, 255, 0.07) 58%,
     transparent 100%
   );
 
-  transform: skewX(-12deg);
+  transform: skewX(-15deg);
 
-  animation: skeleton-sweep 1.7s ease-in-out infinite;
-}
-
-/* ========================================================= */
-/* SMALL SHIMMER INSIDE IMAGE */
-/* ========================================================= */
-
-.skeleton-shimmer {
-  position: absolute;
-
-  inset: 0;
-
-  background: linear-gradient(
-    115deg,
-    transparent 20%,
-    rgba(255, 255, 255, 0.03) 40%,
-    rgba(255, 255, 255, 0.07) 50%,
-    transparent 65%
-  );
-
-  background-size: 220% 100%;
-
-  animation: skeleton-image-shimmer 2s linear infinite;
+  animation: bestsellerShine 1.55s ease-in-out infinite;
 }
 
 /* ========================================================= */
 /* ANIMATIONS */
 /* ========================================================= */
 
-@keyframes skeleton-sweep {
+@keyframes bestsellerShine {
   0% {
-    left: -100%;
+    left: -80%;
   }
 
-  55% {
-    left: 130%;
+  65% {
+    left: 135%;
   }
 
   100% {
-    left: 130%;
+    left: 135%;
   }
 }
 
-@keyframes skeleton-image-shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-@keyframes skeleton-pulse {
+@keyframes skeletonGlow {
   0%,
   100% {
-    opacity: 0.55;
+    opacity: 0.35;
+
+    transform:
+      translate(-50%, -50%)
+      scale(0.9);
   }
 
   50% {
     opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1.15);
   }
 }
 
 /* ========================================================= */
-/* ACCESSIBILITY */
+/* REDUCED MOTION */
 /* ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton-card-sweep,
-  .skeleton-shimmer,
-  .skeleton-line,
-  .skeleton-price,
-  .skeleton-image-icon {
+  .skeleton-shine,
+  .skeleton-image-glow {
     animation: none;
   }
 }
