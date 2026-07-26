@@ -1,9 +1,14 @@
 @import "tailwindcss";
+
+/* ========================================================= */
+/* DISTRESSED / GRUNGE TEXT */
+/* ========================================================= */
+
 .distressed-text {
-  display: block;
   width: fit-content;
 
   color: transparent;
+
   background-image:
     url("/textures/grunge.png"),
     linear-gradient(var(--text-color), var(--text-color));
@@ -13,7 +18,11 @@
     100% 100%;
 
   background-position: center;
-  background-repeat: repeat, no-repeat;
+
+  background-repeat:
+    repeat,
+    no-repeat;
+
   background-blend-mode: multiply;
 
   background-clip: text;
@@ -30,23 +39,20 @@
     0 3px 10px rgba(0, 0, 0, 0.16);
 }
 
-/* Each category */
+/* ========================================================= */
+/* CATEGORY ITEM */
+/* ========================================================= */
 
 .category-item {
   height: clamp(78px, 12vw, 170px);
-  padding: clamp(8px, 1.5vw, 24px) clamp(2px, 1vw, 18px);
 
-  transition:
-    background-color 0.3s ease,
-    transform 0.3s ease;
-}
-
-.category-item:hover {
-  background-color: #ffffff;
+  padding:
+    clamp(8px, 1.5vw, 24px)
+    clamp(2px, 1vw, 18px);
 }
 
 /* ========================================================= */
-/* ICON */
+/* CATEGORY ICON */
 /* ========================================================= */
 
 .category-icon {
@@ -66,7 +72,7 @@
 }
 
 /* ========================================================= */
-/* DESCRIPTION */
+/* CATEGORY DESCRIPTION */
 /* ========================================================= */
 
 .category-description {
@@ -84,13 +90,15 @@
 @media (max-width: 400px) {
   .category-item {
     height: 75px;
+
     padding-left: 1px;
     padding-right: 1px;
   }
 
   .category-icon {
-    font-size: 21px;
     margin-bottom: 4px;
+
+    font-size: 21px;
   }
 
   .category-title {
@@ -98,17 +106,88 @@
   }
 
   .category-description {
-    font-size: 0.29rem;
     margin-top: 3px;
+
+    font-size: 0.29rem;
   }
 }
 
 /* ========================================================= */
-/* DESKTOP */
+/* BESTSELLER CARDS */
 /* ========================================================= */
 
-@media (min-width: 1024px) {
-  .category-item:hover .category-icon {
-    transform: translateY(-5px) scale(1.07);
-  }
+.bestseller-card {
+  position: relative;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  cursor: pointer;
+}
+
+/* ========================================================= */
+/* POPULAR PICKS DECORATIVE LINES */
+/* ========================================================= */
+
+.popular-line {
+  position: relative;
+
+  display: block;
+
+  width: clamp(45px, 11vw, 170px);
+  height: 2px;
+
+  flex-shrink: 1;
+}
+
+/* LEFT LINE */
+
+.popular-line-left {
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(250, 204, 21, 0.1) 15%,
+    rgba(250, 204, 21, 0.45) 55%,
+    #facc15 100%
+  );
+}
+
+/* RIGHT LINE */
+
+.popular-line-right {
+  background: linear-gradient(
+    to left,
+    transparent 0%,
+    rgba(250, 204, 21, 0.1) 15%,
+    rgba(250, 204, 21, 0.45) 55%,
+    #facc15 100%
+  );
+}
+
+/* ========================================================= */
+/* POPULAR PICKS DIAMOND */
+/* ========================================================= */
+
+.popular-point {
+  position: absolute;
+
+  top: 50%;
+
+  width: clamp(5px, 0.55vw, 9px);
+  height: clamp(5px, 0.55vw, 9px);
+
+  background: #facc15;
+
+  transform: translateY(-50%) rotate(45deg);
+
+  box-shadow:
+    0 0 5px rgba(250, 204, 21, 0.8),
+    0 0 10px rgba(250, 204, 21, 0.35);
+}
+
+.popular-line-left .popular-point {
+  right: -3px;
+}
+
+.popular-line-right .popular-point {
+  left: -3px;
 }

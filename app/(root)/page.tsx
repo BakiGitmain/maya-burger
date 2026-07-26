@@ -62,6 +62,43 @@ const categories = [
   },
 ];
 
+/* ================================================= */
+/* TEMPORARY BESTSELLER DATA */
+/* ================================================= */
+
+const bestSellers = [
+  {
+    id: 1,
+    name: "Classic Cheese Burger",
+    description:
+      "Grilled beef patty with cheese, lettuce, tomato & special sauce.",
+    price: 5.49,
+    image: "/images/bestsellers/classic-burger.png",
+  },
+  {
+    id: 2,
+    name: "Veggie Supreme Pizza",
+    description: "Loaded with fresh veggies, cheese & Italian herbs.",
+    price: 8.99,
+    image: "/images/bestsellers/veggie-pizza.png",
+  },
+  {
+    id: 3,
+    name: "Loaded Beef Burrito",
+    description:
+      "Tender beef, fresh veggies, cheese and our signature sauce.",
+    price: 6.99,
+    image: "/images/bestsellers/beef-burrito.png",
+  },
+  {
+    id: 4,
+    name: "Peri Peri Fries",
+    description: "Crispy golden fries tossed in bold peri peri seasoning.",
+    price: 2.99,
+    image: "/images/bestsellers/peri-fries.png",
+  },
+];
+
 export default function HomePage() {
   return (
     <main className="overflow-hidden bg-black text-white">
@@ -116,9 +153,7 @@ export default function HomePage() {
               Cravings, Satisfied
             </p>
 
-            {/* ================================================= */}
             {/* HEADING */}
-            {/* ================================================= */}
 
             <h1
               className={`
@@ -153,9 +188,7 @@ export default function HomePage() {
               </span>
             </h1>
 
-            {/* ================================================= */}
             {/* DESCRIPTION */}
-            {/* ================================================= */}
 
             <p
               className="
@@ -171,9 +204,7 @@ export default function HomePage() {
               satisfy every craving.
             </p>
 
-            {/* ================================================= */}
             {/* BUTTON */}
-            {/* ================================================= */}
 
             <Link
               href="/menu"
@@ -423,130 +454,365 @@ export default function HomePage() {
       {/* FOOD CATEGORIES */}
       {/* ================================================= */}
 
-      {/* ================================================= */}
-{/* FOOD CATEGORIES */}
-{/* ================================================= */}
-
-{/* ================================================= */}
-{/* FOOD CATEGORIES */}
-{/* ================================================= */}
-
-<section
-  className="
-    relative
-    z-30
-    w-full
-    px-[clamp(8px,4vw,60px)]
-    pb-[clamp(35px,6vw,90px)]
-    pt-2
-  "
->
-  <div
-    className="
-      category-container
-      mx-auto
-      flex
-      w-full
-      max-w-[1400px]
-      items-stretch
-      overflow-hidden
-      rounded-[clamp(10px,1.5vw,22px)]
-      bg-[#f7f7f7]
-    "
-  >
-    {categories.map((category, index) => {
-      const Icon = category.icon;
-
-      return (
+      <section
+        className="
+          relative
+          z-30
+          w-full
+          px-[clamp(8px,4vw,60px)]
+          pb-[clamp(35px,6vw,90px)]
+          pt-2
+        "
+      >
         <div
-          key={category.name}
           className="
-            category-item
-            group
-            relative
+            category-container
+            mx-auto
             flex
-            min-w-0
-            flex-1
-            flex-col
-            items-center
-            justify-center
-            text-center
-            transition-all
-            duration-300
-            hover:bg-white
+            w-full
+            max-w-[1400px]
+            items-stretch
+            overflow-hidden
+            rounded-[clamp(10px,1.5vw,22px)]
+            bg-[#f7f7f7]
           "
         >
-          {/* ICON */}
+          {categories.map((category, index) => {
+            const Icon = category.icon;
+
+            return (
+              <div
+                key={category.name}
+                className="
+                  category-item
+                  group
+                  relative
+                  flex
+                  min-w-0
+                  flex-1
+                  flex-col
+                  items-center
+                  justify-center
+                  text-center
+                  transition-all
+                  duration-300
+                  hover:bg-white
+                "
+              >
+                {/* ICON */}
+
+                <div
+                  className="
+                    category-icon
+                    flex
+                    items-center
+                    justify-center
+                    text-black
+                    transition-all
+                    duration-300
+                    group-hover:-translate-y-1
+                    group-hover:scale-110
+                    group-hover:text-yellow-400
+                  "
+                >
+                  <Icon />
+                </div>
+
+                {/* TITLE */}
+
+                <h3
+                  className={`
+                    ${bebas.className}
+                    category-title
+                    whitespace-nowrap
+                    tracking-[0.04em]
+                    text-black
+                    transition-colors
+                    duration-300
+                  `}
+                >
+                  {category.name}
+                </h3>
+
+                {/* DESCRIPTION */}
+
+                <p
+                  className="
+                    category-description
+                    whitespace-nowrap
+                    text-neutral-600
+                    transition-colors
+                    duration-300
+                    group-hover:text-neutral-800
+                  "
+                >
+                  {category.description}
+                </p>
+
+                {/* SEPARATOR */}
+
+                {index !== categories.length - 1 && (
+                  <span
+                    className="
+                      absolute
+                      right-0
+                      top-1/2
+                      h-[65%]
+                      w-px
+                      -translate-y-1/2
+                      bg-yellow-400/40
+                    "
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ================================================= */}
+      {/* BESTSELLERS */}
+      {/* ================================================= */}
+
+      <section
+        className="
+          relative
+          w-full
+          bg-black
+          px-[clamp(14px,4vw,60px)]
+          pb-[clamp(60px,8vw,120px)]
+          pt-[clamp(35px,5vw,70px)]
+        "
+      >
+        <div className="mx-auto w-full max-w-[1400px]">
+          {/* ================================================= */}
+          {/* SECTION HEADING */}
+          {/* ================================================= */}
+
+          <div className="mb-[clamp(24px,4vw,50px)] text-center">
+            {/* POPULAR PICKS */}
+
+            <div className="flex items-center justify-center gap-[clamp(10px,2vw,28px)]">
+              <span className="popular-line popular-line-left">
+                <span className="popular-point" />
+              </span>
+
+              <p
+                className={`
+                  ${allura.className}
+                  whitespace-nowrap
+                  text-[clamp(1.25rem,3vw,3rem)]
+                  leading-none
+                  text-yellow-400
+                `}
+              >
+                Popular Picks
+              </p>
+
+              <span className="popular-line popular-line-right">
+                <span className="popular-point" />
+              </span>
+            </div>
+
+            {/* OUR BESTSELLERS */}
+
+            <h2
+              className={`
+                ${bebas.className}
+                mt-[clamp(7px,1vw,14px)]
+                flex
+                items-center
+                justify-center
+                gap-[clamp(6px,1vw,14px)]
+                whitespace-nowrap
+                text-[clamp(1.4rem,5vw,5rem)]
+                leading-none
+                tracking-wide
+              `}
+            >
+              <span
+                className="
+                  distressed-text
+                  inline-block
+                  [--text-color:white]
+                "
+              >
+                OUR
+              </span>
+
+              <span
+                className="
+                  distressed-text
+                  inline-block
+                  [--text-color:#facc15]
+                "
+              >
+                BESTSELLERS
+              </span>
+            </h2>
+          </div>
+
+          {/* ================================================= */}
+          {/* PRODUCTS */}
+          {/* ================================================= */}
 
           <div
             className="
-              category-icon
-              flex
-              items-center
-              justify-center
-              text-black
-              transition-all
-              duration-300
-
-              group-hover:-translate-y-1
-              group-hover:scale-110
-              group-hover:text-yellow-400
+              grid
+              grid-cols-1
+              gap-[clamp(18px,2vw,28px)]
+              md:grid-cols-2
+              xl:grid-cols-4
             "
           >
-            <Icon />
+            {bestSellers.map((product) => (
+              <article
+                key={product.id}
+                className="
+                  bestseller-card
+                  group
+                  overflow-hidden
+                  rounded-xl
+                  border
+                  border-white/20
+                  bg-[#0d0d0d]
+                "
+              >
+                {/* IMAGE */}
+
+                <div
+                  className="
+                    relative
+                    aspect-[4/3]
+                    w-full
+                    overflow-hidden
+                    bg-[#111]
+                  "
+                >
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="
+                      (max-width: 768px) 100vw,
+                      (max-width: 1280px) 50vw,
+                      25vw
+                    "
+                    className="
+                      object-cover
+                      transition-transform
+                      duration-500
+                      group-hover:scale-105
+                    "
+                  />
+
+                  <div
+                    className="
+                      pointer-events-none
+                      absolute
+                      inset-x-0
+                      bottom-0
+                      h-1/3
+                      bg-gradient-to-t
+                      from-[#0d0d0d]
+                      to-transparent
+                    "
+                  />
+                </div>
+
+                {/* PRODUCT INFO */}
+
+                <div
+                  className="
+                    flex
+                    min-h-[190px]
+                    flex-col
+                    p-[clamp(16px,1.5vw,22px)]
+                  "
+                >
+                  <h3
+                    className={`
+                      ${bebas.className}
+                      text-[clamp(1.4rem,1.8vw,2rem)]
+                      tracking-wide
+                      text-white
+                    `}
+                  >
+                    {product.name}
+                  </h3>
+
+                  <p
+                    className="
+                      mt-2
+                      text-[clamp(0.78rem,0.9vw,0.95rem)]
+                      leading-6
+                      text-white/60
+                    "
+                  >
+                    {product.description}
+                  </p>
+
+                  {/* PRICE */}
+
+                  <p
+                    className={`
+                      ${bebas.className}
+                      mt-auto
+                      pt-5
+                      text-[clamp(1.5rem,2vw,2.1rem)]
+                      tracking-wide
+                      text-yellow-400
+                    `}
+                  >
+                    ${product.price.toFixed(2)}
+                  </p>
+                </div>
+              </article>
+            ))}
           </div>
 
-          {/* TITLE */}
+          {/* ================================================= */}
+          {/* VIEW FULL MENU */}
+          {/* ================================================= */}
 
-          <h3
-            className={`
-              ${bebas.className}
-              category-title
-              whitespace-nowrap
-              tracking-[0.04em]
-              text-black
-              transition-colors
-              duration-300
-            `}
-          >
-            {category.name}
-          </h3>
-
-          {/* DESCRIPTION */}
-
-          <p
-            className="
-              category-description
-              whitespace-nowrap
-              text-neutral-600
-              transition-colors
-              duration-300
-              group-hover:text-neutral-800
-            "
-          >
-            {category.description}
-          </p>
-
-          {/* SEPARATOR */}
-
-          {index !== categories.length - 1 && (
-            <span
+          <div className="mt-[clamp(28px,4vw,50px)] flex justify-center">
+            <Link
+              href="/menu"
               className="
-                absolute
-                right-0
-                top-1/2
-                h-[65%]
-                w-px
-                -translate-y-1/2
-                bg-yellow-400/40
+                group
+                inline-flex
+                items-center
+                justify-center
+                gap-5
+                rounded-full
+                bg-yellow-400
+                px-[clamp(28px,4vw,60px)]
+                py-[clamp(11px,1vw,15px)]
+                text-[clamp(0.75rem,1vw,0.95rem)]
+                font-bold
+                text-black
+                transition-all
+                duration-300
+                hover:-translate-y-1
+                hover:bg-yellow-300
+                hover:shadow-[0_10px_35px_rgba(250,204,21,0.2)]
               "
-            />
-          )}
+            >
+              VIEW FULL MENU
+
+              <ArrowRight
+                className="
+                  h-5
+                  w-5
+                  transition-transform
+                  duration-300
+                  group-hover:translate-x-2
+                "
+              />
+            </Link>
+          </div>
         </div>
-      );
-    })}
-  </div>
-</section>
+      </section>
     </main>
   );
 }
