@@ -25,10 +25,11 @@ export const metadata: Metadata = {
     url: "https://maya-burger.vercel.app",
     siteName: "Maya Burger",
     type: "website",
+    locale: "en_US",
 
     images: [
       {
-        url: "/images/maya-og.png",
+        url: "https://maya-burger.vercel.app/images/maya-og.png",
         width: 1200,
         height: 630,
         alt: "Maya Burger - Best Food Fast and Fresh",
@@ -40,7 +41,13 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Maya Burger",
     description: "Offers Best, fast and fresh Foods!",
-    images: ["/images/maya-og.png"],
+    images: [
+      "https://maya-burger.vercel.app/images/maya-og.png",
+    ],
+  },
+
+  alternates: {
+    canonical: "https://maya-burger.vercel.app",
   },
 };
 
