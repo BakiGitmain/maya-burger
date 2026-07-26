@@ -26,24 +26,12 @@ export const metadata: Metadata = {
     siteName: "Maya Burger",
     type: "website",
     locale: "en_US",
-
-    images: [
-      {
-        url: "https://maya-burger.vercel.app/images/maya-og.png",
-        width: 1200,
-        height: 630,
-        alt: "Maya Burger - Best Food Fast and Fresh",
-      },
-    ],
   },
 
   twitter: {
     card: "summary_large_image",
     title: "Maya Burger",
     description: "Offers Best, fast and fresh Foods!",
-    images: [
-      "https://maya-burger.vercel.app/images/maya-og.png",
-    ],
   },
 
   alternates: {
