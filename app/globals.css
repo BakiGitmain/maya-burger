@@ -441,3 +441,110 @@
     animation: none;
   }
 }
+/* ================================================= */
+/* MENU TEXTURE BUTTON */
+/* ================================================= */
+
+.menu-texture-button {
+  position: relative;
+
+  background-image: url("/textures/menu-button-texturev4.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+
+  background-color: transparent;
+
+  transition:
+    transform 300ms ease,
+    filter 300ms ease;
+}
+
+.menu-texture-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.08);
+}
+/* ================================================= */
+/* WHY CHOOSE US - POINTED DECORATIVE LINES */
+/* ================================================= */
+
+/* ------------------------------------------------- */
+/* LINE UNDER "EVERY BITE" */
+/* ------------------------------------------------- */
+
+.why-bite-line {
+  background: linear-gradient(
+    to right,
+    rgba(250, 204, 21, 0) 0%,
+    rgba(250, 204, 21, 0.75) 7%,
+    #facc15 18%,
+    #facc15 82%,
+    rgba(250, 204, 21, 0.75) 93%,
+    rgba(250, 204, 21, 0) 100%
+  );
+
+  clip-path: polygon(
+    0% 50%,
+    8% 0%,
+    92% 0%,
+    100% 50%,
+    92% 100%,
+    8% 100%
+  );
+}
+
+
+/* ================================================= */
+/* FEATURE CROSS */
+/* ================================================= */
+
+/* ------------------------------------------------- */
+/* HORIZONTAL */
+/* ------------------------------------------------- */
+
+.feature-cross-horizontal {
+  background: linear-gradient(
+    to right,
+    rgba(250, 204, 21, 0) 0%,
+    rgba(250, 204, 21, 0.08) 5%,
+    rgba(250, 204, 21, 0.22) 18%,
+    rgba(250, 204, 21, 0.22) 82%,
+    rgba(250, 204, 21, 0.08) 95%,
+    rgba(250, 204, 21, 0) 100%
+  );
+
+  clip-path: polygon(
+    0% 50%,
+    1.5% 0%,
+    98.5% 0%,
+    100% 50%,
+    98.5% 100%,
+    1.5% 100%
+  );
+}
+
+
+/* ------------------------------------------------- */
+/* VERTICAL */
+/* ------------------------------------------------- */
+
+.feature-cross-vertical {
+  background: linear-gradient(
+    to bottom,
+    rgba(250, 204, 21, 0) 0%,
+    rgba(250, 204, 21, 0.08) 5%,
+    rgba(250, 204, 21, 0.22) 18%,
+    rgba(250, 204, 21, 0.22) 82%,
+    rgba(250, 204, 21, 0.08) 95%,
+    rgba(250, 204, 21, 0) 100%
+  );
+
+  clip-path: polygon(
+    50% 0%,
+    100% 1.5%,
+    100% 98.5%,
+    50% 100%,
+    0% 98.5%,
+    0% 1.5%
+  );
+}

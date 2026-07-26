@@ -17,7 +17,7 @@ import { FaHamburger, FaPizzaSlice, FaHotdog } from "react-icons/fa";
 import { GiFrenchFries } from "react-icons/gi";
 
 import PopularPicks from "@/components/home/popular-picks";
-
+import WhyChooseUs from "@/components/home/why-choose-us";
 const allura = Allura({
   subsets: ["latin"],
   weight: "400",
@@ -537,6 +537,7 @@ export default function HomePage() {
       {/* ================================================= */}
 
       <PopularPicks />
+      <WhyChooseUs />
     </main>
   );
 }
