@@ -12,11 +12,7 @@ import {
 
 import { RiCoupon3Line } from "react-icons/ri";
 
-import {
-  FaHamburger,
-  FaPizzaSlice,
-  FaHotdog,
-} from "react-icons/fa";
+import { FaHamburger, FaPizzaSlice, FaHotdog } from "react-icons/fa";
 
 import { GiFrenchFries } from "react-icons/gi";
 
@@ -499,8 +495,6 @@ export default function HomePage() {
                   hover:bg-white
                 "
               >
-                {/* ICON */}
-
                 <div
                   className="
                     category-icon
@@ -518,8 +512,6 @@ export default function HomePage() {
                   <Icon />
                 </div>
 
-                {/* TITLE */}
-
                 <h3
                   className={`
                     ${bebas.className}
@@ -534,8 +526,6 @@ export default function HomePage() {
                   {category.name}
                 </h3>
 
-                {/* DESCRIPTION */}
-
                 <p
                   className="
                     category-description
@@ -548,8 +538,6 @@ export default function HomePage() {
                 >
                   {category.description}
                 </p>
-
-                {/* SEPARATOR */}
 
                 {index !== categories.length - 1 && (
                   <span
@@ -581,7 +569,7 @@ export default function HomePage() {
           bg-black
           px-[clamp(14px,4vw,60px)]
           pb-[clamp(60px,8vw,120px)]
-          pt-[clamp(35px,5vw,70px)]
+          pt-[clamp(28px,4vw,65px)]
         "
       >
         <div className="mx-auto w-full max-w-[1400px]">
@@ -589,10 +577,18 @@ export default function HomePage() {
           {/* SECTION HEADING */}
           {/* ================================================= */}
 
-          <div className="mb-[clamp(24px,4vw,50px)] text-center">
+          <div className="mb-[clamp(30px,4vw,52px)] text-center">
             {/* POPULAR PICKS */}
 
-            <div className="flex items-center justify-center gap-[clamp(10px,2vw,28px)]">
+            <div
+              className="
+                flex
+                w-full
+                items-center
+                justify-center
+                gap-[clamp(8px,1.5vw,24px)]
+              "
+            >
               <span className="popular-line popular-line-left">
                 <span className="popular-point" />
               </span>
@@ -601,7 +597,7 @@ export default function HomePage() {
                 className={`
                   ${allura.className}
                   whitespace-nowrap
-                  text-[clamp(1.25rem,3vw,3rem)]
+                  text-[clamp(1.7rem,3.2vw,3.2rem)]
                   leading-none
                   text-yellow-400
                 `}
@@ -619,14 +615,14 @@ export default function HomePage() {
             <h2
               className={`
                 ${bebas.className}
-                mt-[clamp(7px,1vw,14px)]
+                mt-[clamp(9px,1vw,16px)]
                 flex
                 items-center
                 justify-center
-                gap-[clamp(6px,1vw,14px)]
+                gap-[clamp(6px,0.9vw,14px)]
                 whitespace-nowrap
-                text-[clamp(1.4rem,5vw,5rem)]
-                leading-none
+                text-[clamp(2.15rem,5vw,5rem)]
+                leading-[0.9]
                 tracking-wide
               `}
             >
@@ -653,14 +649,14 @@ export default function HomePage() {
           </div>
 
           {/* ================================================= */}
-          {/* PRODUCTS */}
+          {/* PRODUCT GRID */}
           {/* ================================================= */}
 
           <div
             className="
               grid
               grid-cols-1
-              gap-[clamp(18px,2vw,28px)]
+              gap-[clamp(24px,2.3vw,32px)]
               md:grid-cols-2
               xl:grid-cols-4
             "
@@ -671,11 +667,18 @@ export default function HomePage() {
                 className="
                   bestseller-card
                   group
+                  w-[84%]
+                  max-w-[325px]
+                  justify-self-center
                   overflow-hidden
                   rounded-xl
-                  border
-                  border-white/20
                   bg-[#0d0d0d]
+
+                  sm:w-[80%]
+                  sm:max-w-[350px]
+
+                  md:w-full
+                  md:max-w-none
                 "
               >
                 {/* IMAGE */}
@@ -683,10 +686,12 @@ export default function HomePage() {
                 <div
                   className="
                     relative
-                    aspect-[4/3]
+                    aspect-[16/11]
                     w-full
                     overflow-hidden
                     bg-[#111]
+
+                    md:aspect-[4/3]
                   "
                 >
                   <Image
@@ -694,7 +699,7 @@ export default function HomePage() {
                     alt={product.name}
                     fill
                     sizes="
-                      (max-width: 768px) 100vw,
+                      (max-width: 640px) 325px,
                       (max-width: 1280px) 50vw,
                       25vw
                     "
@@ -702,7 +707,8 @@ export default function HomePage() {
                       object-cover
                       transition-transform
                       duration-500
-                      group-hover:scale-105
+                      ease-out
+                      group-hover:scale-[1.04]
                     "
                   />
 
@@ -712,7 +718,7 @@ export default function HomePage() {
                       absolute
                       inset-x-0
                       bottom-0
-                      h-1/3
+                      h-[22%]
                       bg-gradient-to-t
                       from-[#0d0d0d]
                       to-transparent
@@ -725,17 +731,23 @@ export default function HomePage() {
                 <div
                   className="
                     flex
-                    min-h-[190px]
+                    min-h-[160px]
                     flex-col
-                    p-[clamp(16px,1.5vw,22px)]
+                    p-4
+
+                    md:min-h-[190px]
+                    md:p-[clamp(16px,1.5vw,22px)]
                   "
                 >
                   <h3
                     className={`
                       ${bebas.className}
-                      text-[clamp(1.4rem,1.8vw,2rem)]
+                      text-[1.35rem]
+                      leading-tight
                       tracking-wide
                       text-white
+
+                      md:text-[clamp(1.4rem,1.8vw,2rem)]
                     `}
                   >
                     {product.name}
@@ -744,24 +756,29 @@ export default function HomePage() {
                   <p
                     className="
                       mt-2
-                      text-[clamp(0.78rem,0.9vw,0.95rem)]
-                      leading-6
+                      text-[0.76rem]
+                      leading-5
                       text-white/60
+
+                      md:text-[clamp(0.78rem,0.9vw,0.95rem)]
+                      md:leading-6
                     "
                   >
                     {product.description}
                   </p>
 
-                  {/* PRICE */}
-
                   <p
                     className={`
                       ${bebas.className}
                       mt-auto
-                      pt-5
-                      text-[clamp(1.5rem,2vw,2.1rem)]
+                      pt-4
+                      text-[1.65rem]
+                      leading-none
                       tracking-wide
                       text-yellow-400
+
+                      md:pt-5
+                      md:text-[clamp(1.5rem,2vw,2.1rem)]
                     `}
                   >
                     ${product.price.toFixed(2)}
@@ -775,7 +792,7 @@ export default function HomePage() {
           {/* VIEW FULL MENU */}
           {/* ================================================= */}
 
-          <div className="mt-[clamp(28px,4vw,50px)] flex justify-center">
+          <div className="mt-[clamp(32px,4vw,50px)] flex justify-center">
             <Link
               href="/menu"
               className="

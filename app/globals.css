@@ -56,9 +56,9 @@
 /* ========================================================= */
 
 .category-icon {
-  font-size: clamp(23px, 3.2vw, 52px);
-
   margin-bottom: clamp(4px, 0.7vw, 11px);
+
+  font-size: clamp(23px, 3.2vw, 52px);
 }
 
 /* ========================================================= */
@@ -113,7 +113,7 @@
 }
 
 /* ========================================================= */
-/* BESTSELLER CARDS */
+/* BESTSELLER CARD */
 /* ========================================================= */
 
 .bestseller-card {
@@ -122,6 +122,16 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
 
   cursor: pointer;
+
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.bestseller-card:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+
+  background-color: #101010;
 }
 
 /* ========================================================= */
@@ -133,8 +143,10 @@
 
   display: block;
 
-  width: clamp(45px, 11vw, 170px);
+  width: clamp(32px, 10vw, 170px);
   height: 2px;
+
+  min-width: 20px;
 
   flex-shrink: 1;
 }
@@ -145,8 +157,8 @@
   background: linear-gradient(
     to right,
     transparent 0%,
-    rgba(250, 204, 21, 0.1) 15%,
-    rgba(250, 204, 21, 0.45) 55%,
+    rgba(250, 204, 21, 0.08) 15%,
+    rgba(250, 204, 21, 0.4) 55%,
     #facc15 100%
   );
 }
@@ -157,8 +169,8 @@
   background: linear-gradient(
     to left,
     transparent 0%,
-    rgba(250, 204, 21, 0.1) 15%,
-    rgba(250, 204, 21, 0.45) 55%,
+    rgba(250, 204, 21, 0.08) 15%,
+    rgba(250, 204, 21, 0.4) 55%,
     #facc15 100%
   );
 }
