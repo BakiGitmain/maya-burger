@@ -13,80 +13,224 @@ export default function AppPreloader({ children }: AppPreloaderProps) {
 
   useEffect(() => {
     let cancelled = false;
+
     let fadeTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const waitForImages = async () => {
-      const images = Array.from(document.images).filter(
-        (image) => !image.hasAttribute("data-preloader"),
+    /* ================================================= */
+    /* SETTINGS */
+    /* ================================================= */
+
+    const minimumLoaderTime = 700;
+
+    // Never trap someone on the loader forever.
+    const maximumLoaderTime = 3500;
+
+    /* ================================================= */
+    /* PAGE IS NOT READY YET */
+    /* ================================================= */
+
+    document.documentElement.dataset.appReady = "false";
+
+    /* ================================================= */
+    /* SMALL DELAY HELPER */
+    /* ================================================= */
+
+    const delay = (ms: number) => {
+      return new Promise<void>((resolve) => {
+        setTimeout(resolve, ms);
+      });
+    };
+
+    /* ================================================= */
+    /* WAIT FOR REACT / NEXT TO PAINT THE PAGE */
+    /* ================================================= */
+
+    const waitForInitialPaint = () => {
+      return new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            resolve();
+          });
+        });
+      });
+    };
+
+    /* ================================================= */
+    /* WAIT ONLY FOR CRITICAL IMAGES */
+    /* ================================================= */
+
+    const waitForCriticalImages = async () => {
+      /*
+        IMPORTANT:
+
+        We ONLY search for images with:
+
+        data-critical
+
+        Popular Picks images must NOT have data-critical.
+      */
+
+      const images = Array.from(
+        document.querySelectorAll<HTMLImageElement>("img[data-critical]"),
       );
+
+      if (images.length === 0) {
+        return;
+      }
 
       await Promise.all(
         images.map((image) => {
-          // Image already finished loading
+          /*
+            Browser already finished the image.
+          */
+
           if (image.complete) {
             return Promise.resolve();
           }
 
-          // Wait until image loads or fails
-          return new Promise<void>((resolve) => {
-            const finish = () => resolve();
+          /*
+            Otherwise wait for real load/error.
+          */
 
-            image.addEventListener("load", finish, { once: true });
-            image.addEventListener("error", finish, { once: true });
+          return new Promise<void>((resolve) => {
+            const finish = () => {
+              resolve();
+            };
+
+            image.addEventListener("load", finish, {
+              once: true,
+            });
+
+            image.addEventListener("error", finish, {
+              once: true,
+            });
           });
         }),
       );
     };
 
-    const waitForPageLoad = async () => {
-      if (document.readyState === "complete") {
+    /* ================================================= */
+    /* WAIT FOR FONTS */
+    /* ================================================= */
+
+    const waitForFonts = async () => {
+      if (!document.fonts?.ready) {
         return;
       }
 
-      await new Promise<void>((resolve) => {
-        window.addEventListener("load", () => resolve(), {
-          once: true,
-        });
-      });
+      try {
+        await document.fonts.ready;
+      } catch {
+        /*
+          Font failure should never trap the website
+          behind the loader.
+        */
+      }
     };
 
-    const waitForEverything = async () => {
+    /* ================================================= */
+    /* WAIT FOR IMPORTANT HOMEPAGE ASSETS */
+    /* ================================================= */
+
+    const waitForCriticalAssets = async () => {
+      /*
+        Give the DOM a chance to render first so things
+        such as the hero <Image> exist before we query them.
+      */
+
+      await waitForInitialPaint();
+
+      await Promise.all([
+        waitForFonts(),
+        waitForCriticalImages(),
+      ]);
+    };
+
+    /* ================================================= */
+    /* FINISH LOADING */
+    /* ================================================= */
+
+    const finishLoading = () => {
+      if (cancelled) return;
+
+      /*
+        Start fading the black loader.
+      */
+
+      setFadeOut(true);
+
+      /*
+        Wait for the 500ms fade animation.
+      */
+
+      fadeTimer = setTimeout(() => {
+        if (cancelled) return;
+
+        /*
+          Reveal the actual site.
+        */
+
+        setLoaded(true);
+
+        /*
+          Tell lazy sections that the main loader
+          has completely finished.
+        */
+
+        document.documentElement.dataset.appReady = "true";
+
+        /*
+          PopularPicks listens for this event.
+        */
+
+        window.dispatchEvent(new Event("app-ready"));
+      }, 500);
+    };
+
+    /* ================================================= */
+    /* RUN PRELOADER */
+    /* ================================================= */
+
+    const runPreloader = async () => {
       const startTime = Date.now();
 
-      // Wait for the browser page load
-      await waitForPageLoad();
+      /*
+        Whichever happens first:
 
-      // Wait for fonts
-      if (document.fonts?.ready) {
-        await document.fonts.ready;
-      }
+        1. Critical assets finish loading
+        2. 3.5 seconds passes
 
-      // Wait for page images
-      await waitForImages();
+        This protects slow-internet users.
+      */
 
-      // Prevent loader from flashing too quickly
-      const minimumLoaderTime = 700;
-      const elapsed = Date.now() - startTime;
+      await Promise.race([
+        waitForCriticalAssets(),
+        delay(maximumLoaderTime),
+      ]);
 
-      if (elapsed < minimumLoaderTime) {
-        await new Promise((resolve) =>
-          setTimeout(resolve, minimumLoaderTime - elapsed),
-        );
+      if (cancelled) return;
+
+      /*
+        Prevent loader from flashing for 50ms
+        on very fast connections.
+      */
+
+      const elapsedTime = Date.now() - startTime;
+
+      if (elapsedTime < minimumLoaderTime) {
+        await delay(minimumLoaderTime - elapsedTime);
       }
 
       if (cancelled) return;
 
-      // Fade loader away
-      setFadeOut(true);
-
-      fadeTimer = setTimeout(() => {
-        if (!cancelled) {
-          setLoaded(true);
-        }
-      }, 500);
+      finishLoading();
     };
 
-    waitForEverything();
+    runPreloader();
+
+    /* ================================================= */
+    /* CLEANUP */
+    /* ================================================= */
 
     return () => {
       cancelled = true;
@@ -99,10 +243,16 @@ export default function AppPreloader({ children }: AppPreloaderProps) {
 
   return (
     <>
-      {/* ================= ACTUAL WEBSITE ================= */}
+      {/* ================================================= */}
+      {/* ACTUAL WEBSITE */}
+      {/* ================================================= */}
+
       <div
+        aria-busy={!loaded}
         className={`
-          transition-opacity duration-500
+          transition-opacity
+          duration-500
+
           ${
             loaded
               ? "opacity-100"
@@ -113,15 +263,31 @@ export default function AppPreloader({ children }: AppPreloaderProps) {
         {children}
       </div>
 
-      {/* ================= FULL SCREEN LOADER ================= */}
+      {/* ================================================= */}
+      {/* FULL SCREEN PRELOADER */}
+      {/* ================================================= */}
+
       {!loaded && (
         <div
           className={`
-            fixed inset-0 z-9999999
-            flex items-center justify-center
+            fixed
+            inset-0
+            z-[9999999]
+
+            flex
+            items-center
+            justify-center
+
             bg-black
-            transition-opacity duration-500
-            ${fadeOut ? "opacity-0" : "opacity-100"}
+
+            transition-opacity
+            duration-500
+
+            ${
+              fadeOut
+                ? "pointer-events-none opacity-0"
+                : "opacity-100"
+            }
           `}
         >
           <Image
@@ -132,7 +298,11 @@ export default function AppPreloader({ children }: AppPreloaderProps) {
             height={150}
             unoptimized
             priority
-            className="h-auto w-30 sm:w-37.5"
+            className="
+              h-auto
+              w-30
+              sm:w-37.5
+            "
           />
         </div>
       )}

@@ -203,3 +203,230 @@
 .popular-line-right .popular-point {
   left: -3px;
 }
+/* ========================================================= */
+/* BESTSELLER LOADING SKELETON */
+/* ========================================================= */
+
+.bestseller-skeleton {
+  position: relative;
+
+  overflow: hidden;
+
+  width: 100%;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  border-radius: 0.75rem;
+
+  background: #0d0d0d;
+}
+
+/* ========================================================= */
+/* SKELETON IMAGE */
+/* ========================================================= */
+
+.skeleton-image {
+  position: relative;
+
+  aspect-ratio: 16 / 11;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(255, 255, 255, 0.07),
+      transparent 42%
+    ),
+    #111111;
+}
+
+@media (min-width: 768px) {
+  .skeleton-image {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ========================================================= */
+/* SOFT IMAGE PULSE */
+/* ========================================================= */
+
+.skeleton-image-icon {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+/* ========================================================= */
+/* CONTENT */
+/* ========================================================= */
+
+.skeleton-content {
+  display: flex;
+
+  min-height: 160px;
+
+  flex-direction: column;
+
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .skeleton-content {
+    min-height: 190px;
+
+    padding: clamp(16px, 1.5vw, 22px);
+  }
+}
+
+/* ========================================================= */
+/* TEXT LINES */
+/* ========================================================= */
+
+.skeleton-line {
+  height: 9px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+.skeleton-title-line {
+  width: 68%;
+
+  height: 18px;
+
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ========================================================= */
+/* PRICE */
+/* ========================================================= */
+
+.skeleton-price {
+  width: 70px;
+  height: 23px;
+
+  margin-top: auto;
+
+  border-radius: 6px;
+
+  background: rgba(250, 204, 21, 0.12);
+
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+/* ========================================================= */
+/* MAIN MOVING SHIMMER */
+/* ========================================================= */
+
+.skeleton-card-sweep {
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  left: -100%;
+
+  width: 70%;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.025) 30%,
+    rgba(255, 255, 255, 0.09) 48%,
+    rgba(250, 204, 21, 0.07) 55%,
+    rgba(255, 255, 255, 0.04) 65%,
+    transparent 100%
+  );
+
+  transform: skewX(-12deg);
+
+  animation: skeleton-sweep 1.7s ease-in-out infinite;
+}
+
+/* ========================================================= */
+/* SMALL SHIMMER INSIDE IMAGE */
+/* ========================================================= */
+
+.skeleton-shimmer {
+  position: absolute;
+
+  inset: 0;
+
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.03) 40%,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent 65%
+  );
+
+  background-size: 220% 100%;
+
+  animation: skeleton-image-shimmer 2s linear infinite;
+}
+
+/* ========================================================= */
+/* ANIMATIONS */
+/* ========================================================= */
+
+@keyframes skeleton-sweep {
+  0% {
+    left: -100%;
+  }
+
+  55% {
+    left: 130%;
+  }
+
+  100% {
+    left: 130%;
+  }
+}
+
+@keyframes skeleton-image-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ========================================================= */
+/* ACCESSIBILITY */
+/* ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-card-sweep,
+  .skeleton-shimmer,
+  .skeleton-line,
+  .skeleton-price,
+  .skeleton-image-icon {
+    animation: none;
+  }
+}

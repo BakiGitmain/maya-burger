@@ -21,6 +21,7 @@ const Navbar = () => {
         {/* DESKTOP LOGO */}
         <Link href="/" className="hidden md:block">
           <Image
+            data-critical
             src="/images/maya_logo.png"
             alt="Maya Burger logo"
             width={80}
@@ -160,6 +161,7 @@ const Navbar = () => {
         {/* MOBILE LOGO */}
         <div className={styles.mobileLogo}>
           <Image
+            data-critical
             src="/images/maya_logo.png"
             alt="Maya Burger"
             width={50}
