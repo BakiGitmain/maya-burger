@@ -18,7 +18,7 @@ const bebas = Bebas_Neue({
 });
 
 /* ================================================= */
-/* TEMPORARY DATA */
+/* TEMP DATA */
 /* ================================================= */
 
 const bestSellers = [
@@ -54,6 +54,10 @@ const bestSellers = [
   },
 ];
 
+/* ================================================= */
+/* TYPE */
+/* ================================================= */
+
 type Product = (typeof bestSellers)[number];
 
 /* ================================================= */
@@ -63,13 +67,13 @@ type Product = (typeof bestSellers)[number];
 function ProductSkeleton() {
   return (
     <div className="bestseller-skeleton">
-      {/* IMAGE */}
+      {/* IMAGE SKELETON */}
 
       <div className="bestseller-skeleton-image">
         <div className="skeleton-image-glow" />
       </div>
 
-      {/* CONTENT */}
+      {/* TEXT SKELETON */}
 
       <div className="bestseller-skeleton-content">
         <div className="skeleton-block skeleton-name" />
@@ -83,7 +87,7 @@ function ProductSkeleton() {
         <div className="skeleton-block skeleton-price" />
       </div>
 
-      {/* SHIMMER */}
+      {/* MOVING SHIMMER */}
 
       <div className="skeleton-shine" />
     </div>
@@ -91,26 +95,18 @@ function ProductSkeleton() {
 }
 
 /* ================================================= */
-/* INDIVIDUAL CARD */
+/* INDIVIDUAL PRODUCT CARD */
 /* ================================================= */
 
 function BestSellerCard({ product }: { product: Product }) {
   const cardRef = useRef<HTMLDivElement | null>(null);
 
-  /*
-    This becomes true ONLY when this specific
-    card enters the viewport.
-  */
   const [shouldLoad, setShouldLoad] = useState(false);
-
-  /*
-    This becomes true only when this card's
-    real image has actually loaded.
-  */
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [minimumLoadingDone, setMinimumLoadingDone] = useState(false);
 
   /* ================================================= */
-  /* WATCH ONLY THIS CARD */
+  /* OBSERVE ONLY THIS CARD */
   /* ================================================= */
 
   useEffect(() => {
@@ -119,13 +115,16 @@ function BestSellerCard({ product }: { product: Product }) {
     if (!card) return;
 
     let observer: IntersectionObserver | null = null;
+
+    let skeletonTimer: ReturnType<typeof setTimeout> | null = null;
+
     let started = false;
 
-    const startWatchingCard = () => {
-      /*
-        Prevent duplicate observers / loading.
-      */
+    /* =============================================== */
+    /* START WATCHING THIS CARD */
+    /* =============================================== */
 
+    const startWatchingCard = () => {
       if (observer || started) return;
 
       observer = new IntersectionObserver(
@@ -133,14 +132,23 @@ function BestSellerCard({ product }: { product: Product }) {
           if (!entry.isIntersecting) return;
 
           /*
-            THIS individual card is now visible.
+            THIS CARD entered the viewport.
 
-            Only now do we mount its real <Image>.
+            Only THIS card's image will now mount.
           */
 
           started = true;
 
           setShouldLoad(true);
+
+          /*
+            Keep skeleton visible for at least
+            one second.
+          */
+
+          skeletonTimer = setTimeout(() => {
+            setMinimumLoadingDone(true);
+          }, 1000);
 
           observer?.disconnect();
           observer = null;
@@ -149,14 +157,14 @@ function BestSellerCard({ product }: { product: Product }) {
           root: null,
 
           /*
-            Do not preload before the card
-            reaches the viewport.
+            No early loading.
           */
 
           rootMargin: "0px",
 
           /*
-            15% of the card must be visible.
+            Around 15% of the card needs to
+            actually be visible.
           */
 
           threshold: 0.15,
@@ -166,30 +174,40 @@ function BestSellerCard({ product }: { product: Product }) {
       observer.observe(card);
     };
 
-    /* ================================================= */
-    /* MAIN APP LOADER ALREADY FINISHED */
-    /* ================================================= */
+    /* =============================================== */
+    /* MAIN PRELOADER ALREADY FINISHED */
+    /* =============================================== */
 
     if (document.documentElement.dataset.appReady === "true") {
       startWatchingCard();
     }
 
-    /* ================================================= */
-    /* OR WAIT FOR MAIN APP LOADER */
-    /* ================================================= */
+    /* =============================================== */
+    /* WAIT FOR MAIN PRELOADER */
+    /* =============================================== */
 
     window.addEventListener("app-ready", startWatchingCard);
 
-    /* ================================================= */
+    /* =============================================== */
     /* CLEANUP */
-    /* ================================================= */
+    /* =============================================== */
 
     return () => {
       window.removeEventListener("app-ready", startWatchingCard);
 
       observer?.disconnect();
+
+      if (skeletonTimer) {
+        clearTimeout(skeletonTimer);
+      }
     };
   }, []);
+
+  /* ================================================= */
+  /* SHOW CARD ONLY WHEN BOTH ARE DONE */
+  /* ================================================= */
+
+  const showCard = imageLoaded && minimumLoadingDone;
 
   return (
     <div
@@ -211,10 +229,12 @@ function BestSellerCard({ product }: { product: Product }) {
       {/* BEFORE THIS CARD ENTERS VIEW */}
       {/* ================================================= */}
 
-      {!shouldLoad && <div className="bestseller-card-placeholder" />}
+      {!shouldLoad && (
+        <div className="bestseller-card-placeholder" />
+      )}
 
       {/* ================================================= */}
-      {/* CARD ENTERED VIEW */}
+      {/* THIS CARD ENTERED VIEW */}
       {/* ================================================= */}
 
       {shouldLoad && (
@@ -232,19 +252,17 @@ function BestSellerCard({ product }: { product: Product }) {
               bg-[#0d0d0d]
 
               transition-all
-              duration-500
+              duration-700
               ease-out
 
               ${
-                imageLoaded
+                showCard
                   ? "translate-y-0 opacity-100"
                   : "translate-y-1 opacity-0"
               }
             `}
           >
-            {/* ================================================= */}
             {/* IMAGE */}
-            {/* ================================================= */}
 
             <div
               className="
@@ -278,7 +296,7 @@ function BestSellerCard({ product }: { product: Product }) {
                 "
               />
 
-              {/* IMAGE BOTTOM FADE */}
+              {/* IMAGE FADE */}
 
               <div
                 className="
@@ -295,7 +313,7 @@ function BestSellerCard({ product }: { product: Product }) {
             </div>
 
             {/* ================================================= */}
-            {/* PRODUCT INFO */}
+            {/* INFO */}
             {/* ================================================= */}
 
             <div
@@ -309,11 +327,10 @@ function BestSellerCard({ product }: { product: Product }) {
                 md:p-[clamp(16px,1.5vw,22px)]
               "
             >
-              {/* NAME */}
-
               <h3
                 className={`
                   ${bebas.className}
+
                   text-[1.35rem]
                   leading-tight
                   tracking-wide
@@ -325,11 +342,10 @@ function BestSellerCard({ product }: { product: Product }) {
                 {product.name}
               </h3>
 
-              {/* DESCRIPTION */}
-
               <p
                 className="
                   mt-2
+
                   text-[0.76rem]
                   leading-5
                   text-white/60
@@ -346,8 +362,10 @@ function BestSellerCard({ product }: { product: Product }) {
               <p
                 className={`
                   ${bebas.className}
+
                   mt-auto
                   pt-4
+
                   text-[1.65rem]
                   leading-none
                   tracking-wide
@@ -363,10 +381,10 @@ function BestSellerCard({ product }: { product: Product }) {
           </article>
 
           {/* ================================================= */}
-          {/* REAL LOADING SKELETON */}
+          {/* SKELETON */}
           {/* ================================================= */}
 
-          {!imageLoaded && (
+          {!showCard && (
             <div
               className="
                 absolute
@@ -384,7 +402,7 @@ function BestSellerCard({ product }: { product: Product }) {
 }
 
 /* ================================================= */
-/* POPULAR PICKS SECTION */
+/* POPULAR PICKS */
 /* ================================================= */
 
 export default function PopularPicks() {
@@ -424,6 +442,7 @@ export default function PopularPicks() {
             <p
               className={`
                 ${allura.className}
+
                 whitespace-nowrap
                 text-[clamp(1.7rem,3.2vw,3.2rem)]
                 leading-none
@@ -443,6 +462,7 @@ export default function PopularPicks() {
           <h2
             className={`
               ${bebas.className}
+
               mt-[clamp(9px,1vw,16px)]
 
               flex
