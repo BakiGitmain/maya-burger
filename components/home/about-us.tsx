@@ -87,7 +87,7 @@ const AboutUs = () => {
         bg-black
         px-[14px]
         pb-[45px]
-        pt-[20px]
+        pt-0
         text-white
 
         lg:px-[clamp(14px,4vw,60px)]
@@ -269,10 +269,10 @@ const AboutUs = () => {
 
             <div
               className="
+               about-hero-line
                 mt-[13px]
                 h-[3px]
                 w-[86px]
-                bg-yellow-400
 
                 lg:mt-[20px]
                 lg:h-[4px]
@@ -314,46 +314,53 @@ const AboutUs = () => {
           {/* HERO IMAGE */}
           {/* ================================================= */}
 
-          <div
-            className="
-              absolute
-              right-[-5%]
-              top-[14px]
-              z-10
+         <div
+  className="
+    absolute
+    right-[-9%]
+    top-[0px]
+    z-10
 
-              h-[280px]
-              w-[64%]
+    h-[330px]
+    w-[72%]
 
-              sm:right-[-2%]
-              sm:h-[295px]
-              sm:w-[61%]
+    sm:right-[-6%]
+    sm:top-[-5px]
+    sm:h-[350px]
+    sm:w-[70%]
 
-              lg:relative
-              lg:right-auto
-              lg:top-auto
+    lg:relative
+    lg:right-auto
+    lg:top-auto
+    lg:h-auto
+    lg:min-h-[520px]
+    lg:w-full
+  "
+>
+  <Image
+    data-critical
+    src="/images/about-us/about-hero.png"
+    alt="Maya Burger with drink"
+    fill
+    sizes="
+      (max-width:640px) 72vw,
+      (max-width:1024px) 70vw,
+      55vw
+    "
+    className="
+      origin-right
+      scale-[1.18]
+      object-contain
+      object-right
 
-              lg:h-auto
-              lg:min-h-[520px]
-              lg:w-full
-            "
-          >
-            <Image
-              data-critical
-              src="/images/about-us/about-hero.png"
-              alt="Maya Burger with drink"
-              fill
-              sizes="
-                (max-width:640px) 64vw,
-                (max-width:1024px) 61vw,
-                55vw
-              "
-              className="
-                object-contain
-                object-right
-                lg:object-center
-              "
-            />
-          </div>
+      sm:scale-[1.16]
+
+      lg:origin-center
+      lg:scale-100
+      lg:object-center
+    "
+  />
+</div>
         </div>
 
         {/* ================================================= */}

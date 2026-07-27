@@ -1344,3 +1344,27 @@
   }
 
 }
+/* ================================================= */
+/* ABOUT US - POINTED FADE LINE */
+/* ================================================= */
+
+.about-hero-line {
+  position: relative;
+
+  background: linear-gradient(
+    to right,
+    #facc15 0%,
+    #facc15 68%,
+    rgba(250, 204, 21, 0.85) 80%,
+    rgba(250, 204, 21, 0.35) 92%,
+    transparent 100%
+  );
+
+  clip-path: polygon(
+    0 0,
+    88% 0,
+    100% 50%,
+    88% 100%,
+    0 100%
+  );
+}
