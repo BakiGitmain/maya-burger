@@ -18,6 +18,8 @@ import { GiFrenchFries } from "react-icons/gi";
 
 import PopularPicks from "@/components/home/popular-picks";
 import WhyChooseUs from "@/components/home/why-choose-us";
+import AboutUs from "@/components/home/about-us";
+
 const allura = Allura({
   subsets: ["latin"],
   weight: "400",
@@ -538,6 +540,7 @@ export default function HomePage() {
 
       <PopularPicks />
       <WhyChooseUs />
+      <AboutUs />
     </main>
   );
 }
