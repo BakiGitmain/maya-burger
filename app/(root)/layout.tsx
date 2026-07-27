@@ -1,6 +1,6 @@
 import Navbar from "@/components/navbar";
 import AppPreloader from "@/components/app-preloader";
-
+import Footer from "@/components/footer";
 export default function RootLayout({
   children,
 }: {
@@ -10,6 +10,7 @@ export default function RootLayout({
     <AppPreloader>
       <Navbar />
       {children}
+      <Footer />
     </AppPreloader>
   );
 }

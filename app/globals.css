@@ -1368,3 +1368,255 @@
     0 100%
   );
 }
+/* ========================================================= */
+/* MAYA BURGER FOOTER */
+/* ========================================================= */
+
+.maya-footer-shell {
+  box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.75),
+    inset 0 0 55px rgba(250, 204, 21, 0.012);
+
+  background:
+    radial-gradient(
+      circle at 12% 20%,
+      rgba(250, 204, 21, 0.025),
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(255, 255, 255, 0.018),
+      transparent 28%
+    ),
+    #050505;
+}
+
+
+/* ========================================================= */
+/* LEFT YELLOW PAINT */
+/* ========================================================= */
+
+.maya-footer-shell::before {
+  content: "";
+
+  position: absolute;
+
+  z-index: 0;
+
+  left: -65px;
+  bottom: -45px;
+
+  width: 300px;
+  height: 260px;
+
+  pointer-events: none;
+
+  background-image:
+    url("/images/why-choose-us/combo-left-texture.png");
+
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: contain;
+
+  opacity: 0.75;
+
+  transform: rotate(-5deg);
+}
+
+
+/* ========================================================= */
+/* RIGHT YELLOW PAINT */
+/* ========================================================= */
+
+.maya-footer-shell::after {
+  content: "";
+
+  position: absolute;
+
+  z-index: 0;
+
+  right: -80px;
+  bottom: -65px;
+
+  width: 320px;
+  height: 260px;
+
+  pointer-events: none;
+
+  background-image:
+    url("/images/why-choose-us/combo-right-texture.png");
+
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+
+  opacity: 0.7;
+
+  transform: rotate(4deg);
+}
+
+
+/* ========================================================= */
+/* BRAND BRUSH */
+/* ========================================================= */
+
+.footer-brand-brush {
+  width: 210px;
+  height: 14px;
+
+  margin-top: 10px;
+
+  background-image:
+    url("/images/about-us/values-title-texture.png");
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+
+/* ========================================================= */
+/* CONTACT ICON BOX */
+/* ========================================================= */
+
+.footer-icon-box {
+  display: flex;
+
+  width: 46px;
+  height: 46px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  border-radius: 10px;
+
+  color: #facc15;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.01)
+    );
+
+  box-shadow:
+    inset 0 0 14px rgba(255, 255, 255, 0.018);
+}
+
+
+/* ========================================================= */
+/* MAP */
+/* ========================================================= */
+
+.maya-footer-map {
+  position: relative;
+
+  width: 100%;
+  height: 270px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  border-radius: 14px;
+
+  background: #101010;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+
+/*
+  Makes the normal Google map visually match
+  the dark Maya Burger theme.
+*/
+
+
+
+
+/* ========================================================= */
+/* ORDER / MENU PAINT BUTTON */
+/* ========================================================= */
+
+.footer-order-button {
+  position: relative;
+
+  background-image:
+    url("/images/about-us/values-title-texture.png");
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+
+  transition:
+    transform 300ms ease,
+    filter 300ms ease;
+}
+
+
+.footer-order-button:hover {
+  transform:
+    translateY(-2px)
+    scale(1.025);
+
+  filter: brightness(1.08);
+}
+
+
+/* ========================================================= */
+/* BOTTOM LINKS */
+/* ========================================================= */
+
+.footer-bottom-link {
+  transition:
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+
+.footer-bottom-link:hover {
+  color: #facc15;
+}
+
+
+/* ========================================================= */
+/* MOBILE */
+/* ========================================================= */
+
+@media (max-width: 639px) {
+
+  .maya-footer-shell::before {
+    left: -100px;
+    bottom: 50px;
+
+    width: 240px;
+    height: 210px;
+
+    opacity: 0.35;
+  }
+
+
+  .maya-footer-shell::after {
+    right: -120px;
+    bottom: 40px;
+
+    width: 250px;
+    height: 210px;
+
+    opacity: 0.3;
+  }
+
+
+  .maya-footer-map {
+    height: 235px;
+  }
+
+
+  .footer-brand-brush {
+    width: 170px;
+  }
+
+}
