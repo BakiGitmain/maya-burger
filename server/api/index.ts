@@ -7,6 +7,8 @@ import adminAuthRouter from "../routes/admin-auth.js";
 
 const app = express();
 
+const PORT = Number(process.env.PORT) || 5000;
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -17,5 +19,13 @@ app.get("/", (req, res) => {
     message: "Maya Burger API is running",
   });
 });
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(
+      `Maya Burger API running on http://localhost:${PORT}`
+    );
+  });
+}
 
 export default app;
