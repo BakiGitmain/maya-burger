@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use("/api/admin", adminAuthRouter);
 
 app.get("/", (req, res) => {
-  res.json({
+  return res.status(200).json({
     message: "Maya Burger API is running",
   });
 });
