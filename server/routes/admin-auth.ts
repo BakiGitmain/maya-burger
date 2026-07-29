@@ -2,8 +2,9 @@ import "dotenv/config";
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { pool } from "../db";
-import { requireAdmin } from "../middleware/admin-auth";
+
+import { pool } from "../db/index.js";
+import { requireAdmin } from "../middleware/admin-auth.js";
 
 const router = Router();
 

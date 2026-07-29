@@ -3,7 +3,7 @@ import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
 
-import adminAuthRouter from "../routes/admin-auth";
+import adminAuthRouter from "../routes/admin-auth.js";
 
 const app = express();
 

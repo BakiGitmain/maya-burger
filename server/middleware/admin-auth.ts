@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { pool } from "../db";
+import { pool } from "../db/index.js";
 
 type AdminToken = {
   id: number;
