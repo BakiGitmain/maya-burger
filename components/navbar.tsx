@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,7 +13,78 @@ import styles from "./navbar.module.css";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
+
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      return;
+    }
+
+    const targetSection = sessionStorage.getItem(
+      "home-scroll-target",
+    );
+
+    if (!targetSection) {
+      return;
+    }
+
+    sessionStorage.removeItem("home-scroll-target");
+
+    const scrollTimer = window.setTimeout(() => {
+      const section = document.getElementById(targetSection);
+
+      if (!section) {
+        return;
+      }
+
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+
+    return () => {
+      window.clearTimeout(scrollTimer);
+    };
+  }, [pathname]);
+
+const scrollToAbout = () => {
+  if (pathname !== "/") {
+    sessionStorage.setItem(
+      "home-scroll-target",
+      "aboutus",
+    );
+
+    router.push("/");
+    return;
+  }
+
+  const aboutSection = document.getElementById("aboutus");
+
+  if (!aboutSection) {
+    return;
+  }
+
+  aboutSection.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+};
+
+  const scrollToContact = () => {
+    const contactSection = document.getElementById("contact");
+
+    if (!contactSection) {
+      return;
+    }
+
+    contactSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   return (
     <nav className="relative w-full">
@@ -102,41 +173,53 @@ const Navbar = () => {
             Menu
           </Link>
 
-          <Link
-            href="/about"
-            className={`
-              relative pb-2
-              after:absolute
-              after:bottom-0
-              after:left-0
-              after:h-0.75
-              after:bg-yellow-400
-              after:transition-all
-              after:duration-300
-              hover:after:w-full
-              ${pathname === "/about" ? "after:w-full" : "after:w-0"}
-            `}
-          >
-            About
-          </Link>
+        <button
+          type="button"
+          onClick={scrollToAbout}
+          className="
+            relative
+            cursor-pointer
+            border-0
+            bg-transparent
+            pb-2
+            text-white
+            after:absolute
+            after:bottom-0
+            after:left-0
+            after:h-0.75
+            after:w-0
+            after:bg-yellow-400
+            after:transition-all
+            after:duration-300
+            hover:after:w-full
+          "
+        >
+          About
+        </button>
 
-          <Link
-            href="/contact"
-            className={`
-              relative pb-2
-              after:absolute
-              after:bottom-0
-              after:left-0
-              after:h-0.75
-              after:bg-yellow-400
-              after:transition-all
-              after:duration-300
-              hover:after:w-full
-              ${pathname === "/contact" ? "after:w-full" : "after:w-0"}
-            `}
-          >
-            Contact
-          </Link>
+      <button
+        type="button"
+        onClick={scrollToContact}
+        className="
+          relative
+          cursor-pointer
+          border-0
+          bg-transparent
+          pb-2
+          text-white
+          after:absolute
+          after:bottom-0
+          after:left-0
+          after:h-0.75
+          after:w-0
+          after:bg-yellow-400
+          after:transition-all
+          after:duration-300
+          hover:after:w-full
+        "
+      >
+        Contact
+      </button>
         </div>
       </div>
 
@@ -192,27 +275,29 @@ const Navbar = () => {
           <span>Menu</span>
         </Link>
 
-        <Link
-          href="/about"
-          onClick={() => setIsOpen(false)}
-          className={`${styles.mobileLink} ${
-            pathname === "/about" ? styles.activeMobileLink : ""
-          }`}
+        <button
+          type="button"
+          onClick={() => {
+            setIsOpen(false);
+            scrollToAbout();
+          }}
+          className={`${styles.mobileLink} w-full cursor-pointer border-0 bg-transparent text-left`}
         >
           <User size={20} />
           <span>About</span>
-        </Link>
+        </button>
 
-        <Link
-          href="/contact"
-          onClick={() => setIsOpen(false)}
-          className={`${styles.mobileLink} ${
-            pathname === "/contact" ? styles.activeMobileLink : ""
-          }`}
+        <button
+          type="button"
+          onClick={() => {
+            setIsOpen(false);
+            scrollToContact();
+          }}
+          className={`${styles.mobileLink} w-full cursor-pointer border-0 bg-transparent text-left`}
         >
           <Phone size={20} />
           <span>Contact</span>
-        </Link>
+        </button>
       </div>
     </nav>
   );

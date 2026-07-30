@@ -86,7 +86,9 @@ const quickLinks = [
 const Footer = () => {
   return (
     <footer
+      id="contact"
       className="
+        scroll-mt-6
         relative
         w-full
         overflow-hidden

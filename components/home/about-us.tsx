@@ -80,7 +80,9 @@ const values = [
 const AboutUs = () => {
   return (
     <section
+      id="aboutus"
       className="
+        scroll-mt-6
         relative
         w-full
         overflow-hidden
