@@ -56,7 +56,7 @@ const mainNavigation: NavItem[] = [
     icon: LayoutDashboard,
   },
   {
-    label: "CMS",
+    label: "Menu",
     href: "/admin/menu",
     icon: FileText,
   },

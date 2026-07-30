@@ -1,17 +1,32 @@
 import Link from "next/link";
+import type { ElementType } from "react";
 
 import {
   ArrowRight,
   Clock3,
-  Construction,
+  LayoutDashboard,
   Menu,
   Settings,
 } from "lucide-react";
 
+type UnderConstructionPageProps = {
+  icon: ElementType;
+  eyebrow: string;
+  title: string;
+  highlightedWord?: string;
+  description: string;
+};
+
 const CONSTRUCTION_IMAGE =
   "https://freesvg.org/img/site-under-construction.png";
 
-export default function AdminDashboardPage() {
+export default function UnderConstructionPage({
+  icon: Icon,
+  eyebrow,
+  title,
+  highlightedWord = "CONSTRUCTION.",
+  description,
+}: UnderConstructionPageProps) {
   return (
     <section className="flex min-h-[calc(100dvh-120px)] items-center">
       <div
@@ -24,8 +39,7 @@ export default function AdminDashboardPage() {
           bg-[var(--admin-panel)]
         "
         style={{
-          borderRadius:
-            "calc(var(--admin-radius) + 8px)",
+          borderRadius: "calc(var(--admin-radius) + 8px)",
         }}
       >
         <div
@@ -41,12 +55,12 @@ export default function AdminDashboardPage() {
             min-h-[650px]
             grid-cols-1
             items-center
-            gap-4
+            gap-6
             px-5
             py-8
             sm:px-8
             sm:py-10
-            lg:grid-cols-[minmax(0,1fr)_minmax(380px,0.9fr)]
+            lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.85fr)]
             lg:gap-10
             lg:px-12
             lg:py-14
@@ -94,8 +108,7 @@ export default function AdminDashboardPage() {
                 <span
                   className="h-2 w-2 rounded-full"
                   style={{
-                    backgroundColor:
-                      "var(--admin-accent)",
+                    backgroundColor: "var(--admin-accent)",
                   }}
                 />
 
@@ -112,27 +125,21 @@ export default function AdminDashboardPage() {
               className="
                 mb-6
                 flex
-                h-13
-                w-13
+                h-14
+                w-14
                 items-center
                 justify-center
                 border
-                sm:h-14
-                sm:w-14
               "
               style={{
                 borderRadius: "var(--admin-radius)",
                 borderColor:
                   "color-mix(in srgb, var(--admin-accent) 35%, transparent)",
-                backgroundColor:
-                  "var(--admin-accent-soft)",
+                backgroundColor: "var(--admin-accent-soft)",
                 color: "var(--admin-accent)",
               }}
             >
-              <Construction
-                size={26}
-                strokeWidth={1.8}
-              />
+              <Icon size={27} strokeWidth={1.8} />
             </div>
 
             <p
@@ -148,23 +155,23 @@ export default function AdminDashboardPage() {
                 color: "var(--admin-accent)",
               }}
             >
-              Maya Burger dashboard
+              {eyebrow}
             </p>
 
             <h1
               className="
                 w-full
-                max-w-[670px]
-                text-[clamp(2.3rem,10.5vw,4.5rem)]
+                max-w-[680px]
+                text-[clamp(2.5rem,11vw,4.6rem)]
                 font-black
-                leading-[0.9]
+                leading-[0.89]
                 tracking-[-0.055em]
                 text-white
-                sm:text-[clamp(3rem,8vw,5rem)]
-                lg:text-[clamp(4rem,5vw,6.1rem)]
+                sm:text-[clamp(3.2rem,8vw,5.3rem)]
+                lg:text-[clamp(4rem,5.2vw,6.2rem)]
               "
             >
-              CURRENTLY
+              {title}
 
               <span
                 className="mt-2 block"
@@ -176,24 +183,12 @@ export default function AdminDashboardPage() {
               </span>
 
               <span className="mt-2 block">
-                CONSTRUCTION.
+                {highlightedWord}
               </span>
             </h1>
 
-            <p
-              className="
-                mt-7
-                max-w-xl
-                text-sm
-                leading-7
-                text-zinc-500
-                sm:text-[15px]
-                sm:leading-8
-              "
-            >
-              We are building a complete dashboard for sales,
-              menu performance, popular items, restaurant
-              activity, and useful business insights.
+            <p className="mt-7 max-w-xl text-sm leading-7 text-zinc-500 sm:text-[15px] sm:leading-8">
+              {description}
             </p>
 
             <div
@@ -207,75 +202,69 @@ export default function AdminDashboardPage() {
                 sm:flex-row
               "
             >
-              <Link
-                href="/admin/menu"
-                className="
-                  group
-                  inline-flex
-                  h-12
-                  w-full
-                  items-center
-                  justify-center
-                  gap-2.5
-                  px-6
-                  text-sm
-                  font-semibold
-                  text-black
-                  transition-transform
-                  duration-200
-                  active:scale-[0.98]
-                  sm:w-auto
-                "
-                style={{
-                  borderRadius: "var(--admin-radius)",
-                  backgroundColor:
-                    "var(--admin-accent)",
-                }}
-              >
-                <Menu size={18} strokeWidth={2} />
+            <Link
+            href="/admin/menu"
+            className="
+                group
+                inline-flex
+                h-12
+                w-full
+                items-center
+                justify-center
+                gap-2.5
+                px-6
+                text-sm
+                font-semibold
+                text-black
+                transition-transform
+                duration-200
+                active:scale-[0.98]
+                sm:w-auto
+            "
+            style={{
+                borderRadius: "var(--admin-radius)",
+                backgroundColor: "var(--admin-accent)",
+            }}
+            >
+            <Menu size={18} />
 
-                Manage menu
+            Manage menu
 
-                <ArrowRight
-                  size={17}
-                  className="
-                    transition-transform
-                    duration-200
-                    group-hover:translate-x-1
-                  "
-                />
-              </Link>
+            <ArrowRight
+                size={17}
+                className="transition-transform duration-200 group-hover:translate-x-1"
+            />
+            </Link>
 
-              <Link
-                href="/admin/settings"
-                className="
-                  inline-flex
-                  h-12
-                  w-full
-                  items-center
-                  justify-center
-                  gap-2.5
-                  border
-                  border-[var(--admin-border)]
-                  bg-[var(--admin-elevated)]
-                  px-6
-                  text-sm
-                  font-medium
-                  text-zinc-300
-                  transition-colors
-                  duration-200
-                  hover:bg-[var(--admin-hover)]
-                  hover:text-white
-                  active:bg-[var(--admin-hover)]
-                  sm:w-auto
-                "
-                style={{
-                  borderRadius: "var(--admin-radius)",
-                }}
-              >
-                <Settings size={18} strokeWidth={1.8} />
-                Open settings
-              </Link>
+            <Link
+            href="/admin/settings"
+            className="
+                inline-flex
+                h-12
+                w-full
+                items-center
+                justify-center
+                gap-2.5
+                border
+                border-[var(--admin-border)]
+                bg-[var(--admin-elevated)]
+                px-6
+                text-sm
+                font-medium
+                text-zinc-300
+                transition-colors
+                duration-200
+                hover:bg-[var(--admin-hover)]
+                hover:text-white
+                sm:w-auto
+            "
+            style={{
+                borderRadius: "var(--admin-radius)",
+            }}
+            >
+            <Settings size={18} />
+            Open settings
+            </Link>
             </div>
 
             <div
@@ -292,24 +281,15 @@ export default function AdminDashboardPage() {
                 text-left
               "
             >
-              <span
-                className="
-                  mt-1.5
-                  h-2
-                  w-2
-                  shrink-0
-                  rounded-full
-                "
-                style={{
-                  backgroundColor:
-                    "var(--admin-accent)",
-                }}
+              <Settings
+                size={17}
+                className="mt-0.5 shrink-0 text-zinc-600"
               />
 
               <p className="text-xs leading-6 text-zinc-600 sm:text-sm">
-                Menu management and settings are already
-                available while the main dashboard is being
-                completed.
+                This section is planned for a future update. Menu
+                management and appearance settings are already
+                available.
               </p>
             </div>
           </div>
@@ -321,58 +301,33 @@ export default function AdminDashboardPage() {
               w-full
               items-center
               justify-center
-              px-1
-              pt-3
+              px-2
+              pt-2
               sm:px-6
               lg:order-2
               lg:px-0
               lg:pt-0
             "
           >
-            <div className="relative flex w-full max-w-[620px] items-center justify-center">
-              <span
-                className="
-                  pointer-events-none
-                  absolute
-                  left-1/2
-                  top-1/2
-                  -z-0
-                  -translate-x-1/2
-                  -translate-y-1/2
-                  select-none
-                  text-[100px]
-                  font-black
-                  leading-none
-                  tracking-[-0.08em]
-                  text-white/[0.025]
-                  sm:text-[150px]
-                  lg:text-[190px]
-                "
-              >
-                WIP
-              </span>
-
+            <div className="relative flex w-full max-w-[560px] items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={CONSTRUCTION_IMAGE}
-                alt="Website dashboard under construction"
+                alt={`${eyebrow} under construction`}
                 loading="eager"
                 decoding="async"
                 referrerPolicy="no-referrer"
                 className="
-                  relative
-                  z-10
                   h-auto
                   w-full
-                  max-w-[330px]
+                  max-w-[270px]
                   object-contain
-                  opacity-90
-                  sm:max-w-[440px]
-                  lg:max-w-[590px]
+                  sm:max-w-[370px]
+                  lg:max-w-[520px]
                 "
                 style={{
                   filter:
-                    "grayscale(0.58) saturate(0.8) contrast(1.08)",
+                    "grayscale(0.55) saturate(0.75) contrast(1.08)",
                 }}
               />
             </div>
