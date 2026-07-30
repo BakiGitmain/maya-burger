@@ -1,11 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Allura, Bebas_Neue } from "next/font/google";
+import {
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  Allura,
+  Bebas_Neue,
+} from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-
 import { ArrowRight } from "lucide-react";
+
+import { getBurgers } from "@/lib/api/burgers";
+import type { Burger } from "@/lib/types/burger";
 
 const allura = Allura({
   subsets: ["latin"],
@@ -17,63 +27,29 @@ const bebas = Bebas_Neue({
   weight: "400",
 });
 
-/* ================================================= */
-/* TEMP DATA */
-/* ================================================= */
-
-const bestSellers = [
+const priceFormatter = new Intl.NumberFormat(
+  "en-US",
   {
-    id: 1,
-    name: "Classic Cheese Burger",
-    description:
-      "Grilled beef patty with cheese, lettuce, tomato & special sauce.",
-    price: 5.49,
-    image: "/images/bestsellers/classic-burger.png",
+    maximumFractionDigits: 2,
   },
-  {
-    id: 2,
-    name: "Veggie Supreme Pizza",
-    description: "Loaded with fresh veggies, cheese & Italian herbs.",
-    price: 8.99,
-    image: "/images/bestsellers/veggie-pizza.png",
-  },
-  {
-    id: 3,
-    name: "Loaded Beef Burrito",
-    description:
-      "Tender beef, fresh veggies, cheese and our signature sauce.",
-    price: 6.99,
-    image: "/images/bestsellers/beef-burrito.png",
-  },
-  {
-    id: 4,
-    name: "Peri Peri Fries",
-    description: "Crispy golden fries tossed in bold peri peri seasoning.",
-    price: 2.99,
-    image: "/images/bestsellers/peri-fries.png",
-  },
-];
+);
 
-/* ================================================= */
-/* TYPE */
-/* ================================================= */
+function formatPrice(price: string) {
+  const value = Number(price);
 
-type Product = (typeof bestSellers)[number];
+  if (!Number.isFinite(value)) {
+    return `${price} BIRR`;
+  }
 
-/* ================================================= */
-/* SKELETON */
-/* ================================================= */
+  return `${priceFormatter.format(value)} BIRR`;
+}
 
 function ProductSkeleton() {
   return (
     <div className="bestseller-skeleton">
-      {/* IMAGE SKELETON */}
-
       <div className="bestseller-skeleton-image">
         <div className="skeleton-image-glow" />
       </div>
-
-      {/* TEXT SKELETON */}
 
       <div className="bestseller-skeleton-content">
         <div className="skeleton-block skeleton-name" />
@@ -87,113 +63,130 @@ function ProductSkeleton() {
         <div className="skeleton-block skeleton-price" />
       </div>
 
-      {/* MOVING SHIMMER */}
-
       <div className="skeleton-shine" />
     </div>
   );
 }
 
-/* ================================================= */
-/* INDIVIDUAL PRODUCT CARD */
-/* ================================================= */
+function CardContainer({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className="
+        relative
+        w-[86%]
+        max-w-[340px]
+        justify-self-center
 
-function BestSellerCard({ product }: { product: Product }) {
-  const cardRef = useRef<HTMLDivElement | null>(null);
+        sm:w-[82%]
+        sm:max-w-[360px]
 
-  const [shouldLoad, setShouldLoad] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [minimumLoadingDone, setMinimumLoadingDone] = useState(false);
+        md:w-full
+        md:max-w-none
+      "
+    >
+      {children}
+    </div>
+  );
+}
 
-  /* ================================================= */
-  /* OBSERVE ONLY THIS CARD */
-  /* ================================================= */
+function BestSellerCard({
+  product,
+}: {
+  product: Burger;
+}) {
+  const cardRef =
+    useRef<HTMLDivElement | null>(null);
+
+  const [shouldLoad, setShouldLoad] =
+    useState(false);
+
+  const [imageLoaded, setImageLoaded] =
+    useState(() => !product.imageUrl);
+
+  const [imageFailed, setImageFailed] =
+    useState(false);
+
+  const [
+    minimumLoadingDone,
+    setMinimumLoadingDone,
+  ] = useState(false);
 
   useEffect(() => {
     const card = cardRef.current;
 
-    if (!card) return;
+    if (!card) {
+      return;
+    }
 
-    let observer: IntersectionObserver | null = null;
+    let observer:
+      | IntersectionObserver
+      | null = null;
 
-    let skeletonTimer: ReturnType<typeof setTimeout> | null = null;
+    let skeletonTimer:
+      | ReturnType<typeof setTimeout>
+      | null = null;
 
     let started = false;
 
-    /* =============================================== */
-    /* START WATCHING THIS CARD */
-    /* =============================================== */
-
     const startWatchingCard = () => {
-      if (observer || started) return;
+      if (observer || started) {
+        return;
+      }
 
-      observer = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry.isIntersecting) return;
+      observer =
+        new IntersectionObserver(
+          ([entry]) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
 
-          /*
-            THIS CARD entered the viewport.
+            started = true;
 
-            Only THIS card's image will now mount.
-          */
+            setShouldLoad(true);
 
-          started = true;
+            skeletonTimer = setTimeout(
+              () => {
+                setMinimumLoadingDone(
+                  true,
+                );
+              },
+              1000,
+            );
 
-          setShouldLoad(true);
-
-          /*
-            Keep skeleton visible for at least
-            one second.
-          */
-
-          skeletonTimer = setTimeout(() => {
-            setMinimumLoadingDone(true);
-          }, 1000);
-
-          observer?.disconnect();
-          observer = null;
-        },
-        {
-          root: null,
-
-          /*
-            No early loading.
-          */
-
-          rootMargin: "0px",
-
-          /*
-            Around 15% of the card needs to
-            actually be visible.
-          */
-
-          threshold: 0.15,
-        },
-      );
+            observer?.disconnect();
+            observer = null;
+          },
+          {
+            root: null,
+            rootMargin: "0px",
+            threshold: 0.15,
+          },
+        );
 
       observer.observe(card);
     };
 
-    /* =============================================== */
-    /* MAIN PRELOADER ALREADY FINISHED */
-    /* =============================================== */
-
-    if (document.documentElement.dataset.appReady === "true") {
+    if (
+      document.documentElement.dataset
+        .appReady === "true"
+    ) {
       startWatchingCard();
     }
 
-    /* =============================================== */
-    /* WAIT FOR MAIN PRELOADER */
-    /* =============================================== */
-
-    window.addEventListener("app-ready", startWatchingCard);
-
-    /* =============================================== */
-    /* CLEANUP */
-    /* =============================================== */
+    window.addEventListener(
+      "app-ready",
+      startWatchingCard,
+    );
 
     return () => {
-      window.removeEventListener("app-ready", startWatchingCard);
+      window.removeEventListener(
+        "app-ready",
+        startWatchingCard,
+      );
 
       observer?.disconnect();
 
@@ -203,52 +196,46 @@ function BestSellerCard({ product }: { product: Product }) {
     };
   }, []);
 
-  /* ================================================= */
-  /* SHOW CARD ONLY WHEN BOTH ARE DONE */
-  /* ================================================= */
+  const showCard =
+    imageLoaded && minimumLoadingDone;
 
-  const showCard = imageLoaded && minimumLoadingDone;
+  const imageSrc =
+    product.imageUrl ?? "";
+
+  const imageIsVisible =
+    imageSrc.length > 0 &&
+    !imageFailed;
 
   return (
     <div
       ref={cardRef}
       className="
         relative
-        w-[84%]
-        max-w-[325px]
+        w-[86%]
+        max-w-[340px]
         justify-self-center
 
-        sm:w-[80%]
-        sm:max-w-[350px]
+        sm:w-[82%]
+        sm:max-w-[360px]
 
         md:w-full
         md:max-w-none
       "
     >
-      {/* ================================================= */}
-      {/* BEFORE THIS CARD ENTERS VIEW */}
-      {/* ================================================= */}
-
       {!shouldLoad && (
         <div className="bestseller-card-placeholder" />
       )}
 
-      {/* ================================================= */}
-      {/* THIS CARD ENTERED VIEW */}
-      {/* ================================================= */}
-
       {shouldLoad && (
         <div className="relative">
-          {/* ================================================= */}
-          {/* REAL CARD */}
-          {/* ================================================= */}
-
           <article
             className={`
               bestseller-card
               group
               overflow-hidden
               rounded-xl
+              border
+              border-white/[0.055]
               bg-[#0d0d0d]
 
               transition-all
@@ -262,8 +249,6 @@ function BestSellerCard({ product }: { product: Product }) {
               }
             `}
           >
-            {/* IMAGE */}
-
             <div
               className="
                 relative
@@ -275,28 +260,129 @@ function BestSellerCard({ product }: { product: Product }) {
                 md:aspect-[4/3]
               "
             >
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                sizes="
-                  (max-width: 640px) 325px,
-                  (max-width: 1280px) 50vw,
-                  25vw
-                "
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageLoaded(true)}
-                className="
-                  object-cover
-                  transition-transform
-                  duration-500
-                  ease-out
+              {imageIsVisible ? (
+                <Image
+                  src={imageSrc}
+                  alt={product.name}
+                  fill
+                  sizes="
+                    (max-width: 640px) 340px,
+                    (max-width: 1279px) 50vw,
+                    25vw
+                  "
+                  onLoad={() => {
+                    setImageLoaded(true);
+                  }}
+                  onError={() => {
+                    setImageFailed(true);
+                    setImageLoaded(true);
+                  }}
+                  className={`
+                    object-cover
 
-                  group-hover:scale-[1.04]
-                "
-              />
+                    transition-transform
+                    duration-500
+                    ease-out
 
-              {/* IMAGE FADE */}
+                    motion-safe:group-hover:scale-[1.035]
+
+                    ${
+                      product.isAvailable
+                        ? ""
+                        : "grayscale-[45%] brightness-[0.72]"
+                    }
+                  `}
+                />
+              ) : (
+                <div
+                  className="
+                    absolute
+                    inset-0
+                    flex
+                    items-center
+                    justify-center
+                    bg-[#151515]
+                  "
+                >
+                  <span
+                    className={`
+                      ${bebas.className}
+
+                      text-2xl
+                      tracking-[0.14em]
+                      text-white/20
+                    `}
+                  >
+                    MAYA BURGER
+                  </span>
+                </div>
+              )}
+
+              <div
+                className={`
+                  absolute
+                  left-3
+                  top-3
+                  z-10
+
+                  inline-flex
+                  items-center
+                  gap-1.5
+
+                  rounded-full
+                  border
+
+                  px-2.5
+                  py-1.5
+
+                  text-[0.61rem]
+                  font-semibold
+                  tracking-[0.12em]
+
+                  shadow-lg
+                  backdrop-blur-md
+
+                  md:left-4
+                  md:top-4
+                  md:px-3
+                  md:text-[0.65rem]
+
+                  ${
+                    product.isAvailable
+                      ? `
+                        border-emerald-300/20
+                        bg-[#07120d]/80
+                        text-emerald-100
+                      `
+                      : `
+                        border-white/15
+                        bg-black/75
+                        text-white/65
+                      `
+                  }
+                `}
+              >
+                <span
+                  className={`
+                    h-1.5
+                    w-1.5
+                    rounded-full
+
+                    ${
+                      product.isAvailable
+                        ? `
+                          bg-emerald-400
+                          shadow-[0_0_8px_rgba(52,211,153,0.75)]
+                        `
+                        : "bg-white/35"
+                    }
+                  `}
+                />
+
+                {product.isAvailable
+                  ? "AVAILABLE"
+                  : "SOLD OUT"}
+              </div>
 
               <div
                 className="
@@ -304,7 +390,8 @@ function BestSellerCard({ product }: { product: Product }) {
                   absolute
                   inset-x-0
                   bottom-0
-                  h-[22%]
+                  h-[24%]
+
                   bg-gradient-to-t
                   from-[#0d0d0d]
                   to-transparent
@@ -312,14 +399,10 @@ function BestSellerCard({ product }: { product: Product }) {
               />
             </div>
 
-            {/* ================================================= */}
-            {/* INFO */}
-            {/* ================================================= */}
-
             <div
               className="
                 flex
-                min-h-[160px]
+                min-h-[164px]
                 flex-col
                 p-4
 
@@ -330,6 +413,8 @@ function BestSellerCard({ product }: { product: Product }) {
               <h3
                 className={`
                   ${bebas.className}
+
+                  line-clamp-2
 
                   text-[1.35rem]
                   leading-tight
@@ -342,22 +427,23 @@ function BestSellerCard({ product }: { product: Product }) {
                 {product.name}
               </h3>
 
-              <p
-                className="
-                  mt-2
+              {product.description && (
+                <p
+                  className="
+                    mt-2
+                    line-clamp-3
 
-                  text-[0.76rem]
-                  leading-5
-                  text-white/60
+                    text-[0.76rem]
+                    leading-5
+                    text-white/60
 
-                  md:text-[clamp(0.78rem,0.9vw,0.95rem)]
-                  md:leading-6
-                "
-              >
-                {product.description}
-              </p>
-
-              {/* PRICE */}
+                    md:text-[clamp(0.78rem,0.9vw,0.95rem)]
+                    md:leading-6
+                  "
+                >
+                  {product.description}
+                </p>
+              )}
 
               <p
                 className={`
@@ -366,23 +452,19 @@ function BestSellerCard({ product }: { product: Product }) {
                   mt-auto
                   pt-4
 
-                  text-[1.65rem]
+                  text-[1.55rem]
                   leading-none
                   tracking-wide
                   text-yellow-400
 
                   md:pt-5
-                  md:text-[clamp(1.5rem,2vw,2.1rem)]
+                  md:text-[clamp(1.5rem,2vw,2.05rem)]
                 `}
               >
-                ${product.price.toFixed(2)}
+                {formatPrice(product.price)}
               </p>
             </div>
           </article>
-
-          {/* ================================================= */}
-          {/* SKELETON */}
-          {/* ================================================= */}
 
           {!showCard && (
             <div
@@ -401,11 +483,59 @@ function BestSellerCard({ product }: { product: Product }) {
   );
 }
 
-/* ================================================= */
-/* POPULAR PICKS */
-/* ================================================= */
-
 export default function PopularPicks() {
+  const [
+    featuredBurgers,
+    setFeaturedBurgers,
+  ] = useState<Burger[]>([]);
+
+  const [status, setStatus] = useState<
+    "loading" | "ready" | "error"
+  >("loading");
+
+  useEffect(() => {
+    let active = true;
+
+    const loadFeaturedBurgers =
+      async () => {
+        try {
+          const burgers =
+            await getBurgers();
+
+          if (!active) {
+            return;
+          }
+
+          const featuredItems =
+            burgers.filter(
+              (burger) =>
+                burger.isFeatured,
+            );
+
+          setFeaturedBurgers(
+            featuredItems,
+          );
+
+          setStatus("ready");
+        } catch (error) {
+          console.error(
+            "Unable to load popular picks:",
+            error,
+          );
+
+          if (active) {
+            setStatus("error");
+          }
+        }
+      };
+
+    void loadFeaturedBurgers();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <section
       className="
@@ -419,13 +549,7 @@ export default function PopularPicks() {
       "
     >
       <div className="mx-auto w-full max-w-[1400px]">
-        {/* ================================================= */}
-        {/* HEADING */}
-        {/* ================================================= */}
-
         <div className="mb-[clamp(30px,4vw,52px)] text-center">
-          {/* POPULAR PICKS */}
-
           <div
             className="
               flex
@@ -457,8 +581,6 @@ export default function PopularPicks() {
             </span>
           </div>
 
-          {/* OUR BESTSELLERS */}
-
           <h2
             className={`
               ${bebas.className}
@@ -469,11 +591,11 @@ export default function PopularPicks() {
               items-center
               justify-center
 
-              gap-[clamp(6px,0.9vw,14px)]
+              gap-[clamp(5px,0.9vw,14px)]
 
               whitespace-nowrap
 
-              text-[clamp(2.15rem,5vw,5rem)]
+              text-[clamp(1.9rem,6vw,5rem)]
               leading-[0.9]
               tracking-wide
             `}
@@ -500,10 +622,6 @@ export default function PopularPicks() {
           </h2>
         </div>
 
-        {/* ================================================= */}
-        {/* PRODUCT GRID */}
-        {/* ================================================= */}
-
         <div
           className="
             grid
@@ -512,21 +630,60 @@ export default function PopularPicks() {
             gap-[clamp(24px,2.3vw,32px)]
 
             md:grid-cols-2
-
             xl:grid-cols-4
           "
         >
-          {bestSellers.map((product) => (
-            <BestSellerCard
-              key={product.id}
-              product={product}
-            />
-          ))}
-        </div>
+          {status === "loading" &&
+            Array.from({
+              length: 4,
+            }).map((_, index) => (
+              <CardContainer key={index}>
+                <ProductSkeleton />
+              </CardContainer>
+            ))}
 
-        {/* ================================================= */}
-        {/* VIEW FULL MENU */}
-        {/* ================================================= */}
+          {status === "ready" &&
+            featuredBurgers.map(
+              (product) => (
+                <BestSellerCard
+                  key={product.id}
+                  product={product}
+                />
+              ),
+            )}
+
+          {status === "ready" &&
+            featuredBurgers.length ===
+              0 && (
+              <div
+                className="
+                  col-span-full
+                  py-10
+                  text-center
+                  text-sm
+                  text-white/40
+                "
+              >
+                Fresh picks are coming
+                soon.
+              </div>
+            )}
+
+          {status === "error" && (
+            <div
+              className="
+                col-span-full
+                py-10
+                text-center
+                text-sm
+                text-white/40
+              "
+            >
+              Popular picks are
+              unavailable right now.
+            </div>
+          )}
+        </div>
 
         <div className="mt-[clamp(32px,4vw,50px)] flex justify-center">
           <Link
@@ -540,7 +697,6 @@ export default function PopularPicks() {
               gap-5
 
               rounded-full
-
               bg-yellow-400
 
               px-[clamp(28px,4vw,60px)]

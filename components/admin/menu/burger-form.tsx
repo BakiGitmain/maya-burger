@@ -35,10 +35,10 @@ type BurgerFormProps = {
 const categories = [
   "Burgers",
   "Chicken",
-  "Sides",
+  "Pizza",
   "Drinks",
   "Desserts",
-  "Combos",
+  "SandWich",
 ];
 
 const inputClass =

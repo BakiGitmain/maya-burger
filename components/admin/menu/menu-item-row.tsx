@@ -45,7 +45,17 @@ function BurgerImage({
   if (!burger.imageUrl) {
     return (
       <div
-        className={`flex ${sizeClass} shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-400 dark:bg-zinc-800`}
+        className={`
+          flex
+          ${sizeClass}
+          shrink-0
+          items-center
+          justify-center
+          rounded-xl
+          bg-zinc-100
+          text-zinc-400
+          dark:bg-zinc-800
+        `}
       >
         <ImageIcon size={20} />
       </div>
@@ -56,7 +66,13 @@ function BurgerImage({
     <img
       src={burger.imageUrl}
       alt={burger.name}
-      className={`${sizeClass} shrink-0 rounded-xl object-cover`}
+      loading="lazy"
+      className={`
+        ${sizeClass}
+        shrink-0
+        rounded-xl
+        object-cover
+      `}
     />
   );
 }
@@ -113,9 +129,22 @@ export default function MenuItemRow({
               </span>
 
               <span
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ring-inset ${statusClass}`}
+                className={`
+                  inline-flex
+                  items-center
+                  gap-1
+                  rounded-full
+                  px-2
+                  py-1
+                  text-[11px]
+                  font-semibold
+                  ring-1
+                  ring-inset
+                  ${statusClass}
+                `}
               >
                 <span className="size-1.5 rounded-full bg-current" />
+
                 {burger.isAvailable
                   ? "Available"
                   : "Unavailable"}
@@ -140,9 +169,7 @@ export default function MenuItemRow({
 
             <button
               type="button"
-              onClick={() =>
-                onDelete(burger)
-              }
+              onClick={() => onDelete(burger)}
               className="inline-flex size-9 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950"
               aria-label={`Delete ${burger.name}`}
             >
@@ -188,9 +215,22 @@ export default function MenuItemRow({
 
       <td className="px-5 py-4">
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${statusClass}`}
+          className={`
+            inline-flex
+            items-center
+            gap-1.5
+            rounded-full
+            px-2.5
+            py-1
+            text-xs
+            font-semibold
+            ring-1
+            ring-inset
+            ${statusClass}
+          `}
         >
           <span className="size-1.5 rounded-full bg-current" />
+
           {burger.isAvailable
             ? "Available"
             : "Unavailable"}
@@ -225,9 +265,7 @@ export default function MenuItemRow({
 
           <button
             type="button"
-            onClick={() =>
-              onDelete(burger)
-            }
+            onClick={() => onDelete(burger)}
             className="inline-flex size-9 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950"
             aria-label={`Delete ${burger.name}`}
           >
