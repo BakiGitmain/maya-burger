@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -54,9 +55,8 @@ const siteUrl = (
 
 const menuUrl = `${siteUrl}/menu`;
 
-// Change this number whenever you want the fake QR preview larger or smaller.
-// The image will still shrink automatically on narrow mobile screens.
 const QR_PREVIEW_MAX_SIZE = 320;
+const PREVIEW_LOADER_MINIMUM_MS = 650;
 
 function formatPrice(price: string) {
   const value = Number(price);
@@ -95,12 +95,73 @@ function getBurgerSearchText(item: Burger) {
     .toLowerCase();
 }
 
+function waitForNextPaint() {
+  return new Promise<void>((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        resolve();
+      });
+    });
+  });
+}
+
+async function waitForImageElement(
+  image: HTMLImageElement
+) {
+  if (!image.complete) {
+    await new Promise<void>((resolve) => {
+      const finish = () => resolve();
+
+      image.addEventListener("load", finish, {
+        once: true,
+      });
+
+      image.addEventListener("error", finish, {
+        once: true,
+      });
+    });
+  }
+
+  try {
+    await image.decode();
+  } catch {
+    // Prevent one failed image from keeping the loader open forever.
+  }
+}
+
+async function preloadImageSource(src: string) {
+  await new Promise<void>((resolve) => {
+    const image = new window.Image();
+
+    const finish = () => {
+      resolve();
+    };
+
+    image.addEventListener("load", finish, {
+      once: true,
+    });
+
+    image.addEventListener("error", finish, {
+      once: true,
+    });
+
+    image.src = src;
+
+    if (image.complete) {
+      resolve();
+    }
+  });
+}
+
 export default function DigitalMenuPanel({
   burgers,
   loading,
 }: DigitalMenuPanelProps) {
   const qrCanvasRef =
     useRef<HTMLCanvasElement | null>(null);
+
+  const previewContentRef =
+    useRef<HTMLDivElement | null>(null);
 
   const [qrName, setQrName] = useState(
     "Main Dining Menu"
@@ -111,6 +172,11 @@ export default function DigitalMenuPanel({
 
   const [copied, setCopied] =
     useState(false);
+
+  const [
+    loadedPreviewSignature,
+    setLoadedPreviewSignature,
+  ] = useState("");
 
   const availableItems = useMemo(
     () =>
@@ -124,6 +190,124 @@ export default function DigitalMenuPanel({
     () => availableItems.slice(0, 3),
     [availableItems]
   );
+
+  const previewAssetSignature = useMemo(
+    () =>
+      [
+        "qr-fake-v1",
+        "iphone-frame-v1",
+        "hero-burger-v1",
+        ...previewItems.map(
+          (item) =>
+            `${item.id}:${
+              item.imageUrl ?? "no-image"
+            }`
+        ),
+      ].join("|"),
+    [previewItems]
+  );
+
+  const previewIsLoading =
+    loading ||
+    loadedPreviewSignature !==
+      previewAssetSignature;
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function preparePreview() {
+      const startedAt = performance.now();
+
+      await Promise.all([
+        preloadImageSource(
+          "/images/maya_logo.png"
+        ),
+        preloadImageSource(
+          "/images/QR-Fake.png"
+        ),
+        preloadImageSource(
+          "/images/hero-burger.png"
+        ),
+        preloadImageSource(
+          IPHONE_FRAME_URL
+        ),
+        waitForNextPaint(),
+      ]);
+
+      const previewRoot =
+        previewContentRef.current;
+
+      const previewImages = previewRoot
+        ? Array.from(
+            previewRoot.querySelectorAll(
+              "img"
+            )
+          )
+        : [];
+
+      await Promise.all(
+        previewImages.map(
+          waitForImageElement
+        )
+      );
+
+      for (
+        let attempt = 0;
+        attempt < 20;
+        attempt += 1
+      ) {
+        const canvas = qrCanvasRef.current;
+
+        if (
+          canvas &&
+          canvas.width > 0 &&
+          canvas.height > 0
+        ) {
+          break;
+        }
+
+        await waitForNextPaint();
+      }
+
+      await waitForNextPaint();
+
+      const elapsed =
+        performance.now() - startedAt;
+
+      const remaining = Math.max(
+        0,
+        PREVIEW_LOADER_MINIMUM_MS -
+          elapsed
+      );
+
+      if (remaining > 0) {
+        await new Promise<void>(
+          (resolve) => {
+            window.setTimeout(
+              resolve,
+              remaining
+            );
+          }
+        );
+      }
+
+      if (!cancelled) {
+        setLoadedPreviewSignature(
+          previewAssetSignature
+        );
+      }
+    }
+
+    void preparePreview();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, previewAssetSignature]);
 
   const stats = [
     {
@@ -1438,161 +1622,198 @@ export default function DigitalMenuPanel({
             </div>
           </div>
 
-          <div className="p-3 sm:p-5 lg:p-6">
-            <div className="hidden" aria-hidden="true">
-              <QRCodeCanvas
-                ref={qrCanvasRef}
-                value={menuUrl}
-                size={720}
-                level="H"
-                marginSize={2}
-                bgColor="#ffffff"
-                fgColor="#050505"
-                title={qrName}
-                imageSettings={
-                  includeLogo
-                    ? {
-                        src: "/images/maya_logo.png",
-                        width: 120,
-                        height: 120,
-                        excavate: true,
-                      }
-                    : undefined
-                }
-              />
-            </div>
+          <div
+            className="relative p-3 sm:p-5 lg:p-6"
+            aria-busy={previewIsLoading}
+          >
+            <div ref={previewContentRef}>
+              <div
+                className="hidden"
+                aria-hidden="true"
+              >
+                <QRCodeCanvas
+                  ref={qrCanvasRef}
+                  value={menuUrl}
+                  size={720}
+                  level="H"
+                  marginSize={2}
+                  bgColor="#ffffff"
+                  fgColor="#050505"
+                  title={qrName}
+                  imageSettings={
+                    includeLogo
+                      ? {
+                          src: "/images/maya_logo.png",
+                          width: 120,
+                          height: 120,
+                          excavate: true,
+                        }
+                      : undefined
+                  }
+                />
+              </div>
 
-            <div className="mx-auto w-full max-w-[820px]">
-              <div className="grid grid-cols-[minmax(0,58fr)_minmax(0,42fr)] items-start gap-[clamp(6px,1.6vw,18px)]">
-                <div className="min-w-0 pt-[4%]">
-                  <div
-                    className="mx-auto w-full rounded-[clamp(12px,2vw,22px)] border border-zinc-200 bg-zinc-100 p-[clamp(5px,1.2vw,13px)] dark:border-zinc-800 dark:bg-zinc-950"
-                    style={{
-                      maxWidth: `${QR_PREVIEW_MAX_SIZE}px`,
-                    }}
-                  >
-                    <div className="rounded-[clamp(10px,1.7vw,18px)] border border-zinc-200 bg-white p-[clamp(6px,1.25vw,14px)] shadow-[0_14px_45px_rgba(0,0,0,0.08)] dark:border-zinc-800">
-                      <div className="relative aspect-square w-full overflow-hidden rounded-[clamp(6px,1vw,10px)] bg-white">
-                        <Image
-                          src="/images/maya-burger-menu-qr.png"
-                          alt="Maya Burger QR code preview"
-                          fill
-                          priority
-                          sizes="(max-width: 640px) 46vw, 320px"
-                          className="object-contain"
-                        />
+              <div className="mx-auto w-full max-w-[820px]">
+                <div className="grid grid-cols-[minmax(0,58fr)_minmax(0,42fr)] items-start gap-[clamp(6px,1.6vw,18px)]">
+                  <div className="min-w-0 pt-[4%]">
+                    <div
+                      className="mx-auto w-full rounded-[clamp(12px,2vw,22px)] border border-zinc-200 bg-zinc-100 p-[clamp(5px,1.2vw,13px)] dark:border-zinc-800 dark:bg-zinc-950"
+                      style={{
+                        maxWidth: `${QR_PREVIEW_MAX_SIZE}px`,
+                      }}
+                    >
+                      <div className="rounded-[clamp(10px,1.7vw,18px)] border border-zinc-200 bg-white p-[clamp(6px,1.25vw,14px)] shadow-[0_14px_45px_rgba(0,0,0,0.08)] dark:border-zinc-800">
+                        <div className="relative aspect-square w-full overflow-hidden rounded-[clamp(6px,1vw,10px)] bg-white">
+                          <Image
+                            src="/images/QR-Fake.png"
+                            alt="Maya Burger QR code preview"
+                            fill
+                            priority
+                            sizes="(max-width: 640px) 46vw, 320px"
+                            className="object-contain"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="mt-[clamp(8px,1.5vw,14px)] grid grid-cols-3 gap-[clamp(3px,0.8vw,8px)]">
-                    <button
-                      type="button"
-                      onClick={handleDownload}
-                      className="inline-flex h-[clamp(30px,4.8vw,44px)] min-w-0 items-center justify-center gap-[clamp(2px,0.5vw,6px)] rounded-[clamp(7px,1.3vw,12px)] border border-zinc-200 bg-white px-1 text-[clamp(6px,1vw,11px)] font-semibold text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 sm:px-2 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
-                    >
-                      <Download className="size-[clamp(10px,1.6vw,15px)] shrink-0" />
-                      <span className="truncate">
-                        Download
-                      </span>
-                    </button>
+                    <div className="mt-[clamp(8px,1.5vw,14px)] grid grid-cols-3 gap-[clamp(3px,0.8vw,8px)]">
+                      <button
+                        type="button"
+                        onClick={handleDownload}
+                        className="inline-flex h-[clamp(30px,4.8vw,44px)] min-w-0 items-center justify-center gap-[clamp(2px,0.5vw,6px)] rounded-[clamp(7px,1.3vw,12px)] border border-zinc-200 bg-white px-1 text-[clamp(6px,1vw,11px)] font-semibold text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 sm:px-2 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+                      >
+                        <Download className="size-[clamp(10px,1.6vw,15px)] shrink-0" />
 
-                    <button
-                      type="button"
-                      onClick={handlePrint}
-                      className="inline-flex h-[clamp(30px,4.8vw,44px)] min-w-0 items-center justify-center gap-[clamp(2px,0.5vw,6px)] rounded-[clamp(7px,1.3vw,12px)] border border-zinc-200 bg-white px-1 text-[clamp(6px,1vw,11px)] font-semibold text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 sm:px-2 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
-                    >
-                      <Printer className="size-[clamp(10px,1.6vw,15px)] shrink-0" />
-                      <span className="truncate">
-                        Print
-                      </span>
-                    </button>
+                        <span className="truncate">
+                          Download
+                        </span>
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={handleCopyLink}
-                      className="inline-flex h-[clamp(30px,4.8vw,44px)] min-w-0 items-center justify-center gap-[clamp(2px,0.5vw,6px)] rounded-[clamp(7px,1.3vw,12px)] border border-zinc-200 bg-white px-1 text-[clamp(6px,1vw,11px)] font-semibold text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 sm:px-2 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
-                    >
-                      {copied ? (
-                        <Check className="size-[clamp(10px,1.6vw,15px)] shrink-0 text-emerald-500" />
-                      ) : (
-                        <Copy className="size-[clamp(10px,1.6vw,15px)] shrink-0" />
-                      )}
+                      <button
+                        type="button"
+                        onClick={handlePrint}
+                        className="inline-flex h-[clamp(30px,4.8vw,44px)] min-w-0 items-center justify-center gap-[clamp(2px,0.5vw,6px)] rounded-[clamp(7px,1.3vw,12px)] border border-zinc-200 bg-white px-1 text-[clamp(6px,1vw,11px)] font-semibold text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 sm:px-2 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+                      >
+                        <Printer className="size-[clamp(10px,1.6vw,15px)] shrink-0" />
 
-                      <span className="truncate">
-                        {copied
-                          ? "Copied"
-                          : "Copy link"}
-                      </span>
-                    </button>
-                  </div>
-
-                  <div className="mt-[clamp(10px,1.8vw,18px)]">
-                    <label
-                      htmlFor="preview-destination"
-                      className="text-[clamp(6px,1vw,11px)] font-semibold uppercase tracking-[0.12em] text-zinc-500 dark:text-zinc-400"
-                    >
-                      Destination URL
-                    </label>
-
-                    <div className="mt-2 flex overflow-hidden rounded-[clamp(8px,1.4vw,12px)] border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
-                      <div className="flex size-[clamp(30px,4.8vw,44px)] shrink-0 items-center justify-center border-r border-zinc-200 text-zinc-400 dark:border-zinc-800">
-                        <Link2 className="size-[clamp(10px,1.7vw,16px)]" />
-                      </div>
-
-                      <input
-                        id="preview-destination"
-                        readOnly
-                        value={menuUrl}
-                        className="min-w-0 flex-1 bg-transparent px-2 text-[clamp(6px,1.05vw,12px)] text-zinc-700 outline-none sm:px-3 dark:text-zinc-300"
-                      />
+                        <span className="truncate">
+                          Print
+                        </span>
+                      </button>
 
                       <button
                         type="button"
                         onClick={handleCopyLink}
-                        aria-label="Copy menu URL"
-                        className="flex size-[clamp(30px,4.8vw,44px)] shrink-0 items-center justify-center border-l border-zinc-200 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:hover:text-white"
+                        className="inline-flex h-[clamp(30px,4.8vw,44px)] min-w-0 items-center justify-center gap-[clamp(2px,0.5vw,6px)] rounded-[clamp(7px,1.3vw,12px)] border border-zinc-200 bg-white px-1 text-[clamp(6px,1vw,11px)] font-semibold text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 sm:px-2 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
                       >
                         {copied ? (
-                          <Check className="size-[clamp(10px,1.7vw,16px)] text-emerald-500" />
+                          <Check className="size-[clamp(10px,1.6vw,15px)] shrink-0 text-emerald-500" />
                         ) : (
-                          <Copy className="size-[clamp(10px,1.7vw,16px)]" />
+                          <Copy className="size-[clamp(10px,1.6vw,15px)] shrink-0" />
                         )}
+
+                        <span className="truncate">
+                          {copied
+                            ? "Copied"
+                            : "Copy link"}
+                        </span>
                       </button>
+                    </div>
+
+                    <div className="mt-[clamp(10px,1.8vw,18px)]">
+                      <label
+                        htmlFor="preview-destination"
+                        className="text-[clamp(6px,1vw,11px)] font-semibold uppercase tracking-[0.12em] text-zinc-500 dark:text-zinc-400"
+                      >
+                        Destination URL
+                      </label>
+
+                      <div className="mt-2 flex overflow-hidden rounded-[clamp(8px,1.4vw,12px)] border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
+                        <div className="flex size-[clamp(30px,4.8vw,44px)] shrink-0 items-center justify-center border-r border-zinc-200 text-zinc-400 dark:border-zinc-800">
+                          <Link2 className="size-[clamp(10px,1.7vw,16px)]" />
+                        </div>
+
+                        <input
+                          id="preview-destination"
+                          readOnly
+                          value={menuUrl}
+                          className="min-w-0 flex-1 bg-transparent px-2 text-[clamp(6px,1.05vw,12px)] text-zinc-700 outline-none sm:px-3 dark:text-zinc-300"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={
+                            handleCopyLink
+                          }
+                          aria-label="Copy menu URL"
+                          className="flex size-[clamp(30px,4.8vw,44px)] shrink-0 items-center justify-center border-l border-zinc-200 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:hover:text-white"
+                        >
+                          {copied ? (
+                            <Check className="size-[clamp(10px,1.7vw,16px)] text-emerald-500" />
+                          ) : (
+                            <Copy className="size-[clamp(10px,1.7vw,16px)]" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-[clamp(9px,1.5vw,14px)] flex items-start gap-[clamp(4px,0.8vw,8px)] rounded-[clamp(8px,1.4vw,12px)] border border-amber-200 bg-amber-50/80 p-[clamp(6px,1.2vw,12px)] dark:border-amber-400/20 dark:bg-amber-400/5">
+                      <QrCode className="mt-0.5 size-[clamp(10px,1.7vw,17px)] shrink-0 text-amber-600 dark:text-amber-400" />
+
+                      <p className="text-[clamp(6px,1.05vw,12px)] leading-[1.55] text-zinc-600 dark:text-zinc-400">
+                        This QR stays the same
+                        when you update prices,
+                        images or menu
+                        availability.
+                      </p>
                     </div>
                   </div>
 
-                  <div className="mt-[clamp(9px,1.5vw,14px)] flex items-start gap-[clamp(4px,0.8vw,8px)] rounded-[clamp(8px,1.4vw,12px)] border border-amber-200 bg-amber-50/80 p-[clamp(6px,1.2vw,12px)] dark:border-amber-400/20 dark:bg-amber-400/5">
-                    <QrCode className="mt-0.5 size-[clamp(10px,1.7vw,17px)] shrink-0 text-amber-600 dark:text-amber-400" />
+                  <div className="relative z-20 min-w-0">
+                    <PhonePreview
+                      items={previewItems}
+                      loading={loading}
+                    />
 
-                    <p className="text-[clamp(6px,1.05vw,12px)] leading-[1.55] text-zinc-600 dark:text-zinc-400">
-                      This QR stays the same when
-                      you update prices, images or
-                      menu availability.
+                    <p className="mt-[clamp(4px,0.8vw,8px)] text-center text-[clamp(6px,1vw,11px)] font-medium text-zinc-500">
+                      Tap the phone to enlarge
                     </p>
+
+                    <a
+                      href={
+                        IPHONE_FRAME_SOURCE
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mx-auto mt-1 block w-fit text-center text-[clamp(5px,0.8vw,9px)] text-zinc-400 transition hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-400"
+                    >
+                      iPhone frame: Wikimedia
+                      Commons
+                    </a>
                   </div>
                 </div>
-
-                <div className="relative z-20 min-w-0">
-                  <PhonePreview
-                    items={previewItems}
-                    loading={loading}
-                  />
-
-                  <p className="mt-[clamp(4px,0.8vw,8px)] text-center text-[clamp(6px,1vw,11px)] font-medium text-zinc-500">
-                    Tap the phone to enlarge
-                  </p>
-
-                  <a
-                    href={IPHONE_FRAME_SOURCE}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mx-auto mt-1 block w-fit text-center text-[clamp(5px,0.8vw,9px)] text-zinc-400 transition hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-400"
-                  >
-                    iPhone frame: Wikimedia Commons
-                  </a>
-                </div>
               </div>
+            </div>
+
+            <div
+              className={`absolute inset-0 z-[90] flex items-center justify-center overflow-hidden rounded-b-2xl bg-white/95 transition-opacity duration-500 dark:bg-[#161618]/95 ${
+                previewIsLoading
+                  ? "pointer-events-auto opacity-100"
+                  : "pointer-events-none opacity-0"
+              }`}
+              aria-hidden={
+                !previewIsLoading
+              }
+            >
+              <Image
+                src="/images/loader.gif"
+                alt="Loading digital QR menu preview"
+                width={112}
+                height={112}
+                priority
+                unoptimized
+                className="h-auto w-[clamp(72px,11vw,112px)] object-contain"
+              />
             </div>
           </div>
         </section>
@@ -1768,7 +1989,9 @@ function PhonePreview({
     <>
       <button
         type="button"
-        onClick={() => setIsExpanded(true)}
+        onClick={() =>
+          setIsExpanded(true)
+        }
         aria-label="Enlarge customer mobile preview"
         className="group relative block w-full cursor-zoom-in rounded-[12%] text-left outline-none focus-visible:ring-4 focus-visible:ring-amber-400/40"
       >
@@ -1787,38 +2010,42 @@ function PhonePreview({
       typeof document !== "undefined"
         ? createPortal(
             <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Expanded customer mobile preview"
-          onClick={() => setIsExpanded(false)}
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-3 backdrop-blur-md"
-        >
-          <button
-            type="button"
-            onClick={() => setIsExpanded(false)}
-            aria-label="Close expanded preview"
-            className="absolute right-4 top-4 z-[220] flex size-11 items-center justify-center rounded-full border border-white/15 bg-zinc-950/90 text-white shadow-xl transition hover:bg-zinc-800"
-          >
-            <X size={20} />
-          </button>
+              role="dialog"
+              aria-modal="true"
+              aria-label="Expanded customer mobile preview"
+              onClick={() =>
+                setIsExpanded(false)
+              }
+              className="fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-3 backdrop-blur-md"
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  setIsExpanded(false)
+                }
+                aria-label="Close expanded preview"
+                className="absolute right-4 top-4 z-[220] flex size-11 items-center justify-center rounded-full border border-white/15 bg-zinc-950/90 text-white shadow-xl transition hover:bg-zinc-800"
+              >
+                <X size={20} />
+              </button>
 
-          <div
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-            className="relative"
-            style={{
-              width:
-                "min(90vw, calc(91vh * 356 / 730), 410px)",
-            }}
-          >
-            <PhoneDevice
-              items={items}
-              loading={loading}
-              expanded
-            />
-          </div>
-        </div>,
+              <div
+                onClick={(event) =>
+                  event.stopPropagation()
+                }
+                className="relative"
+                style={{
+                  width:
+                    "min(90vw, calc(91vh * 356 / 730), 410px)",
+                }}
+              >
+                <PhoneDevice
+                  items={items}
+                  loading={loading}
+                  expanded
+                />
+              </div>
+            </div>,
             document.body
           )
         : null}
@@ -1927,6 +2154,7 @@ function PhoneDevice({
 
               <div className="flex h-[10cqw] items-center gap-[2cqw] rounded-[3.3cqw] border border-white/10 bg-[#111111] px-[3.2cqw] text-[2.1cqw] font-semibold text-zinc-400">
                 Featured first
+
                 <span className="text-[3.4cqw] leading-none text-amber-400">
                   ⌄
                 </span>
@@ -1941,62 +2169,71 @@ function PhoneDevice({
                 <PhoneSkeleton />
               </>
             ) : items.length > 0 ? (
-              items.map((item, index) => (
-                <article
-                  key={item.id}
-                  className="overflow-hidden rounded-[5.6cqw] border border-white/10 bg-[#0d0d0d]"
-                >
-                  <div className="relative h-[53cqw] overflow-hidden bg-[#101415]">
-                    {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.name}
-                        fill
-                        sizes="(max-width: 640px) 280px, 360px"
-                        className="object-cover object-center"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_center,rgba(255,196,0,0.12),transparent_65%)]">
-                        <UtensilsCrossed className="size-[9.5cqw] text-zinc-700" />
+              items.map(
+                (item, index) => (
+                  <article
+                    key={item.id}
+                    className="overflow-hidden rounded-[5.6cqw] border border-white/10 bg-[#0d0d0d]"
+                  >
+                    <div className="relative h-[53cqw] overflow-hidden bg-[#101415]">
+                      {item.imageUrl ? (
+                        <Image
+                          src={
+                            item.imageUrl
+                          }
+                          alt={item.name}
+                          fill
+                          sizes="(max-width: 640px) 280px, 360px"
+                          loading="eager"
+                          className="object-cover object-center"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_center,rgba(255,196,0,0.12),transparent_65%)]">
+                          <UtensilsCrossed className="size-[9.5cqw] text-zinc-700" />
+                        </div>
+                      )}
+
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-[#0d0d0d]" />
+
+                      <div className="absolute left-[3.4cqw] top-[3.4cqw] rounded-full border border-white/10 bg-black/70 px-[3.3cqw] py-[1.7cqw] text-[2.1cqw] font-black uppercase tracking-[0.16em] text-zinc-300 backdrop-blur-md">
+                        {item.category ||
+                          "Menu"}
                       </div>
-                    )}
 
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-[#0d0d0d]" />
-
-                    <div className="absolute left-[3.4cqw] top-[3.4cqw] rounded-full border border-white/10 bg-black/70 px-[3.3cqw] py-[1.7cqw] text-[2.1cqw] font-black uppercase tracking-[0.16em] text-zinc-300 backdrop-blur-md">
-                      {item.category || "Menu"}
+                      <div className="absolute right-[3.4cqw] top-[3.4cqw] flex items-center gap-[1.7cqw] rounded-full border border-emerald-400/30 bg-emerald-500/10 px-[3.3cqw] py-[1.7cqw] text-[2.1cqw] font-black uppercase tracking-[0.12em] text-emerald-300 backdrop-blur-md">
+                        <span className="size-[1.7cqw] rounded-full bg-emerald-400 shadow-[0_0_2.2cqw_rgba(52,211,153,0.95)]" />
+                        Available
+                      </div>
                     </div>
 
-                    <div className="absolute right-[3.4cqw] top-[3.4cqw] flex items-center gap-[1.7cqw] rounded-full border border-emerald-400/30 bg-emerald-500/10 px-[3.3cqw] py-[1.7cqw] text-[2.1cqw] font-black uppercase tracking-[0.12em] text-emerald-300 backdrop-blur-md">
-                      <span className="size-[1.7cqw] rounded-full bg-emerald-400 shadow-[0_0_2.2cqw_rgba(52,211,153,0.95)]" />
-                      Available
+                    <div className="p-[4.5cqw]">
+                      <div className="flex items-start justify-between gap-[3cqw]">
+                        <h4 className="min-w-0 flex-1 text-[5.1cqw] font-black uppercase leading-none tracking-[-0.025em] text-white">
+                          {item.name}
+                        </h4>
+
+                        {index === 0 ? (
+                          <span className="shrink-0 border-b border-amber-400 pb-[1cqw] text-[2.1cqw] font-black uppercase tracking-[0.18em] text-amber-400">
+                            Popular
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <p className="mt-[3.4cqw] line-clamp-3 text-[2.8cqw] leading-[1.65] text-zinc-400">
+                        {item.description ||
+                          `${item.category} prepared fresh with bold Maya Burger flavor.`}
+                      </p>
+
+                      <p className="mt-[5.5cqw] text-[6.5cqw] font-black uppercase leading-none tracking-[-0.03em] text-amber-400">
+                        {formatPrice(
+                          item.price
+                        )}{" "}
+                        Birr
+                      </p>
                     </div>
-                  </div>
-
-                  <div className="p-[4.5cqw]">
-                    <div className="flex items-start justify-between gap-[3cqw]">
-                      <h4 className="min-w-0 flex-1 text-[5.1cqw] font-black uppercase leading-none tracking-[-0.025em] text-white">
-                        {item.name}
-                      </h4>
-
-                      {index === 0 ? (
-                        <span className="shrink-0 border-b border-amber-400 pb-[1cqw] text-[2.1cqw] font-black uppercase tracking-[0.18em] text-amber-400">
-                          Popular
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <p className="mt-[3.4cqw] line-clamp-3 text-[2.8cqw] leading-[1.65] text-zinc-400">
-                      {item.description ||
-                        `${item.category} prepared fresh with bold Maya Burger flavor.`}
-                    </p>
-
-                    <p className="mt-[5.5cqw] text-[6.5cqw] font-black uppercase leading-none tracking-[-0.03em] text-amber-400">
-                      {formatPrice(item.price)} Birr
-                    </p>
-                  </div>
-                </article>
-              ))
+                  </article>
+                )
+              )
             ) : (
               <div className="rounded-[5.6cqw] border border-dashed border-white/10 bg-[#0d0d0d] px-[4.5cqw] py-[11cqw] text-center">
                 <p className="text-[2.8cqw] leading-[1.7] text-zinc-500">
@@ -2018,8 +2255,11 @@ function PhoneSkeleton() {
 
       <div className="space-y-[3cqw] p-[4.5cqw]">
         <div className="h-[4cqw] w-2/3 rounded bg-zinc-800" />
+
         <div className="h-[2.5cqw] w-full rounded bg-zinc-800" />
+
         <div className="h-[2.5cqw] w-5/6 rounded bg-zinc-800" />
+
         <div className="h-[6cqw] w-1/3 rounded bg-zinc-800" />
       </div>
     </div>
