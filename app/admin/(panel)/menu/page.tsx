@@ -2,6 +2,8 @@
 
 import {
   AlertCircle,
+  List,
+  QrCode,
   RefreshCw,
 } from "lucide-react";
 import {
@@ -11,6 +13,7 @@ import {
 } from "react";
 
 import DeleteItemDialog from "@/components/admin/menu/delete-item-dialog";
+import DigitalMenuPanel from "@/components/admin/menu/digital-menu-panel";
 import MenuHeader from "@/components/admin/menu/menu-header";
 import MenuStats from "@/components/admin/menu/menu-stats";
 import MenuTable from "@/components/admin/menu/menu-table";
@@ -18,7 +21,6 @@ import MenuToolbar, {
   type SortOption,
   type StatusFilter,
 } from "@/components/admin/menu/menu-toolbar";
-
 import {
   deleteBurger,
   getBurgers,
@@ -26,9 +28,14 @@ import {
 
 import type { Burger } from "@/lib/types/burger";
 
+type MenuView = "items" | "digital";
+
 const pageSize = 8;
 
 export default function MenuManagementPage() {
+  const [activeView, setActiveView] =
+    useState<MenuView>("items");
+
   const [burgers, setBurgers] = useState<
     Burger[]
   >([]);
@@ -101,8 +108,8 @@ export default function MenuManagementPage() {
           )
           .filter(Boolean)
       )
-    ).sort((a, b) =>
-      a.localeCompare(b)
+    ).sort((first, second) =>
+      first.localeCompare(second)
     );
   }, [burgers]);
 
@@ -234,9 +241,49 @@ export default function MenuManagementPage() {
   return (
     <div className="min-h-full bg-zinc-50 px-4 py-5 sm:px-6 sm:py-7 lg:px-8 dark:bg-zinc-950">
       <div className="mx-auto max-w-[1500px] space-y-6">
-        <MenuHeader />
+        <MenuHeader
+          activeView={activeView}
+        />
 
-        <MenuStats burgers={burgers} />
+        <div className="flex overflow-x-auto border-b border-zinc-200 dark:border-zinc-800">
+          <button
+            type="button"
+            onClick={() =>
+              setActiveView("items")
+            }
+            className={`relative inline-flex h-12 shrink-0 items-center gap-2 px-4 text-sm font-semibold transition ${
+              activeView === "items"
+                ? "text-amber-600 dark:text-amber-400"
+                : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200"
+            }`}
+          >
+            <List size={17} />
+            Menu Items
+
+            {activeView === "items" && (
+              <span className="absolute bottom-0 left-4 right-4 h-0.5 rounded-full bg-amber-400" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setActiveView("digital")
+            }
+            className={`relative inline-flex h-12 shrink-0 items-center gap-2 px-4 text-sm font-semibold transition ${
+              activeView === "digital"
+                ? "text-amber-600 dark:text-amber-400"
+                : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200"
+            }`}
+          >
+            <QrCode size={17} />
+            Digital QR Menu
+
+            {activeView === "digital" && (
+              <span className="absolute bottom-0 left-4 right-4 h-0.5 rounded-full bg-amber-400" />
+            )}
+          </button>
+        </div>
 
         {error && (
           <div className="flex flex-col gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-red-900 dark:bg-red-950/40">
@@ -264,44 +311,55 @@ export default function MenuManagementPage() {
           </div>
         )}
 
-        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <MenuToolbar
-            search={search}
-            category={category}
-            status={status}
-            sort={sort}
-            categories={categories}
-            onSearchChange={(value) => {
-              setSearch(value);
-              resetToFirstPage();
-            }}
-            onCategoryChange={(value) => {
-              setCategory(value);
-              resetToFirstPage();
-            }}
-            onStatusChange={(value) => {
-              setStatus(value);
-              resetToFirstPage();
-            }}
-            onSortChange={(value) => {
-              setSort(value);
-              resetToFirstPage();
-            }}
-          />
+        {activeView === "items" ? (
+          <>
+            <MenuStats burgers={burgers} />
 
-          <MenuTable
-            items={paginatedBurgers}
+            <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <MenuToolbar
+                search={search}
+                category={category}
+                status={status}
+                sort={sort}
+                categories={categories}
+                onSearchChange={(value) => {
+                  setSearch(value);
+                  resetToFirstPage();
+                }}
+                onCategoryChange={(value) => {
+                  setCategory(value);
+                  resetToFirstPage();
+                }}
+                onStatusChange={(value) => {
+                  setStatus(value);
+                  resetToFirstPage();
+                }}
+                onSortChange={(value) => {
+                  setSort(value);
+                  resetToFirstPage();
+                }}
+              />
+
+              <MenuTable
+                items={paginatedBurgers}
+                loading={loading}
+                page={currentPage}
+                pageSize={pageSize}
+                totalCount={
+                  filteredBurgers.length
+                }
+                totalPages={totalPages}
+                onPageChange={setPage}
+                onDelete={setDeleteTarget}
+              />
+            </section>
+          </>
+        ) : (
+          <DigitalMenuPanel
+            burgers={burgers}
             loading={loading}
-            page={currentPage}
-            pageSize={pageSize}
-            totalCount={
-              filteredBurgers.length
-            }
-            totalPages={totalPages}
-            onPageChange={setPage}
-            onDelete={setDeleteTarget}
           />
-        </section>
+        )}
       </div>
 
       <DeleteItemDialog
