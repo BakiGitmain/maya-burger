@@ -227,7 +227,7 @@ export default function DigitalMenuPanel({
           "/images/maya_logo.png"
         ),
         preloadImageSource(
-          "/images/QR-Fake.png"
+          "/images/maya-burger-menu-qr.png"
         ),
         preloadImageSource(
           "/images/hero-burger.png"
@@ -1665,7 +1665,7 @@ export default function DigitalMenuPanel({
                       <div className="rounded-[clamp(10px,1.7vw,18px)] border border-zinc-200 bg-white p-[clamp(6px,1.25vw,14px)] shadow-[0_14px_45px_rgba(0,0,0,0.08)] dark:border-zinc-800">
                         <div className="relative aspect-square w-full overflow-hidden rounded-[clamp(6px,1vw,10px)] bg-white">
                           <Image
-                            src="/images/QR-Fake.png"
+                            src="/images/maya-burger-menu-qr.png"
                             alt="Maya Burger QR code preview"
                             fill
                             priority
