@@ -39,7 +39,14 @@ app.use(
   "/api/burgers",
   burgerRouter
 );
-
+app.get("/api/health", (_req, res) => {
+  return res.status(200).json({
+    success: true,
+    status: "ok",
+    service: "maya-burger-api",
+    timestamp: new Date().toISOString(),
+  });
+});
 app.get("/", (req, res) => {
   return res.status(200).json({
     message:
